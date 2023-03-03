@@ -1,0 +1,12 @@
+.terraform.lock.hcl
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+.idea/*
+.build
+.tls/*
+.gcloud/*
+terraform.tfvars
+.auth/
+.terraform.tfstate.lock.info
+/.auth/*
