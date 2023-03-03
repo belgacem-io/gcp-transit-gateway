@@ -51,23 +51,6 @@ module "private_service_connect" {
   forwarding_rule_target       = "all-apis"
 }
 
-/******************************************
-  Routes to internet
- *****************************************/
-
-resource "google_compute_route" "internet_routes" {
-  count = var.mode == "hub" ? 1 : 0
-
-  project          = var.project_id
-  network          = module.main.network_name
-  #[prefix]-[resource]-[location]-[description]-[suffix]
-  name             = "${var.prefix}-rt-glb-${var.network_name}-internet"
-  description      = "Transitivity route for internet"
-  tags             = [var.network_internet_egress_tag]
-  dest_range       = "0.0.0.0/0"
-  next_hop_gateway = "default-internet-gateway"
-}
-
 
 /******************************************
   Mandatory firewall rules

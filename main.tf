@@ -14,10 +14,13 @@ module "nethub" {
   default_region                = var.default_region
   shared_vpc_host               = false
   dns_enable_inbound_forwarding = false
+  nat_enabled                   = true
 
   public_subnets              = var.hub_public_subnets
   private_subnets             = var.hub_private_subnets
   private_svc_connect_subnets = var.hub_private_svc_connect_subnets
+
+  allow_all_egress_ranges     = concat(var.spoke1_private_subnets.*.subnet_ip,var.spoke2_private_subnets.*.subnet_ip)
 }
 
 module "nethub_bastion" {

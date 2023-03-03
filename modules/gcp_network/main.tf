@@ -85,7 +85,6 @@ module "main" {
         name              = "${var.prefix}-rt-glb-1000-egress-internet-default"
         description       = "Tag based route through IGW to access internet"
         destination_range = "0.0.0.0/0"
-        tags              = var.network_internet_egress_tag
         next_hop_internet = "true"
         priority          = "1000"
       }
@@ -104,4 +103,26 @@ module "main" {
     ]
     : []
   )
+}
+
+/******************************************
+  Firewall to internet
+ *****************************************/
+resource "google_compute_firewall" "internet" {
+  count = var.mode == "hub" ? 1 : 0
+
+  #[prefix]-[resource]-[location]-[description]-[suffix]
+  name      = "${var.prefix}-fw-glb-egress-internet-default"
+  project   = var.project_id
+  network   = module.main.network_name
+  direction = "EGRESS"
+  allow {
+    protocol = "tcp"
+  }
+  allow {
+    protocol = "udp"
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = [var.network_internet_egress_tag]
 }

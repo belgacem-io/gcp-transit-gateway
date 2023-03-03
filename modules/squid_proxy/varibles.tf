@@ -155,3 +155,9 @@ variable "firewall_enable_logging" {
   description = "Toggle firewall logging for VPC Firewalls."
   default     = true
 }
+
+variable "authorized_members" {
+  description = "List of members in the standard GCP form: user:{email}, serviceAccount:{email}, group:{email}"
+  type        = list(string)
+  default = []
+}
