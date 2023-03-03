@@ -1,25 +1,46 @@
+locals {
+  environment_code = "demo"
+  prefix           = "${var.project_id}-${local.environment_code}"
+
+}
 module "nethub" {
   source = "./modules/gcp_network"
 
-  prefix                        = "poc-tgw-demo"
+  prefix                        = local.prefix
+  environment_code              = local.environment_code
   mode                          = "hub"
-  environment_code              = "demo"
   network_name                  = "hub"
   project_id                    = var.project_id
   default_region                = var.default_region
   shared_vpc_host               = false
   dns_enable_inbound_forwarding = false
 
-  public_subnets = var.hub_public_subnets
-  private_subnets = var.hub_private_subnets
+  public_subnets              = var.hub_public_subnets
+  private_subnets             = var.hub_private_subnets
   private_svc_connect_subnets = var.hub_private_svc_connect_subnets
+}
+
+module "nethub_bastion" {
+  source             = "./modules/gcp_bastion_host"
+  prefix             = local.prefix
+  environment_code   = local.environment_code
+  authorized_members = []
+  instance_name      = "hub-bastion"
+  network_self_link  = module.nethub.network_self_link
+  project_id         = var.project_id
+  region             = var.default_region
+  subnet_self_link   = module.nethub.subnets_self_links[0]
+
+  depends_on = [
+    module.nethub
+  ]
 }
 
 module "netspoke1" {
   source                        = "./modules/gcp_network"
-  prefix                        = "poc-tgw-demo1"
+  prefix                        = "${local.prefix}1"
+  environment_code              = local.environment_code
   mode                          = "spoke"
-  environment_code              = "demo"
   network_name                  = "spoke1"
   project_id                    = var.project_id
   default_region                = var.default_region
@@ -35,11 +56,27 @@ module "netspoke1" {
   ]
 }
 
+module "netspoke1_bastion" {
+  source             = "./modules/gcp_bastion_host"
+  prefix             = "${local.prefix}1"
+  environment_code   = local.environment_code
+  authorized_members = []
+  instance_name      = "spoke1-bastion"
+  network_self_link  = module.netspoke1.network_self_link
+  project_id         = var.project_id
+  region             = var.default_region
+  subnet_self_link   = module.netspoke1.subnets_self_links[0]
+
+  depends_on = [
+    module.netspoke1
+  ]
+}
+
 module "netspoke2" {
   source                        = "./modules/gcp_network"
-  prefix                        = "poc-tgw-demo2"
+  prefix                        = "${local.prefix}2"
+  environment_code              = local.environment_code
   mode                          = "spoke"
-  environment_code              = "demo"
   network_name                  = "spoke2"
   project_id                    = var.project_id
   default_region                = var.default_region
@@ -52,5 +89,21 @@ module "netspoke2" {
 
   depends_on = [
     module.nethub
+  ]
+}
+
+module "netspoke2_bastion" {
+  source             = "./modules/gcp_bastion_host"
+  prefix             = "${local.prefix}2"
+  environment_code   = local.environment_code
+  authorized_members = []
+  instance_name      = "spoke2-bastion"
+  network_self_link  = module.netspoke2.network_self_link
+  project_id         = var.project_id
+  region             = var.default_region
+  subnet_self_link   = module.netspoke2.subnets_self_links[0]
+
+  depends_on = [
+    module.netspoke2
   ]
 }

@@ -29,6 +29,10 @@ module "transitivity_gateway" {
   subnet_name                  = local.private_subnets[0].subnet_name
   vpc_name                     = module.main.network_name
   network_internet_egress_tag  = var.network_internet_egress_tag
+
+  depends_on = [
+    module.main
+  ]
 }
 /******************************************
   Private Google APIs DNS Zone & records.
@@ -59,7 +63,7 @@ resource "google_compute_route" "internet_routes" {
   #[prefix]-[resource]-[location]-[description]-[suffix]
   name             = "${var.prefix}-rt-glb-${var.network_name}-internet"
   description      = "Transitivity route for internet"
-  tags             = [module.main.network_name]
+  tags             = [var.network_internet_egress_tag]
   dest_range       = "0.0.0.0/0"
   next_hop_gateway = "default-internet-gateway"
 }
