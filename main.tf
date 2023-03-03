@@ -1,7 +1,7 @@
 module "nethub" {
   source = "./modules/gcp_network"
 
-  prefix                        = "nethub"
+  prefix                        = "poc-tgw-demo"
   mode                          = "hub"
   environment_code              = "demo"
   network_name                  = "hub"
@@ -10,35 +10,25 @@ module "nethub" {
   shared_vpc_host               = false
   dns_enable_inbound_forwarding = false
 
-  public_subnets = [
-    for subnet in var.hub_public_subnets :merge({ project_name : var.project_id }, subnet)
-  ]
-  private_subnets = [
-    for subnet in var.hub_private_subnets :merge({ project_name : var.project_id }, subnet)
-  ]
-  private_svc_connect_subnets = [
-    for subnet in var.hub_private_svc_connect_subnets :
-    merge({ project_name : var.project_id }, subnet)
-  ]
+  public_subnets = var.hub_public_subnets
+  private_subnets = var.hub_private_subnets
+  private_svc_connect_subnets = var.hub_private_svc_connect_subnets
 }
 
 module "netspoke1" {
   source                        = "./modules/gcp_network"
-  prefix                        = "netspoke1"
+  prefix                        = "poc-tgw-demo1"
   mode                          = "spoke"
   environment_code              = "demo"
-  network_name                  = "spoke2"
+  network_name                  = "spoke1"
   project_id                    = var.project_id
   default_region                = var.default_region
   shared_vpc_host               = false
   dns_enable_inbound_forwarding = false
   org_nethub_project_id         = var.project_id
   org_nethub_vpc_self_link      = module.nethub.network_self_link
-  org_nethub_tgw_service_attachment_id = module.nethub.tgw_service_attachment_id
 
-  private_subnets = [
-    for subnet in var.spoke1_private_subnets :merge({ project_name : var.project_id }, subnet)
-  ]
+  private_subnets = var.spoke1_private_subnets
 
   depends_on = [
     module.nethub
@@ -47,7 +37,7 @@ module "netspoke1" {
 
 module "netspoke2" {
   source                        = "./modules/gcp_network"
-  prefix                        = "netspoke2"
+  prefix                        = "poc-tgw-demo2"
   mode                          = "spoke"
   environment_code              = "demo"
   network_name                  = "spoke2"
@@ -57,11 +47,8 @@ module "netspoke2" {
   dns_enable_inbound_forwarding = false
   org_nethub_project_id         = var.project_id
   org_nethub_vpc_self_link      = module.nethub.network_self_link
-  org_nethub_tgw_service_attachment_id = module.nethub.tgw_service_attachment_id
 
-  private_subnets = [
-    for subnet in var.spoke2_private_subnets :merge({ project_name : var.project_id }, subnet)
-  ]
+  private_subnets = var.spoke2_private_subnets
 
   depends_on = [
     module.nethub

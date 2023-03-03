@@ -24,7 +24,7 @@ module "transitivity_gateway" {
   default_region               = var.default_region
   prefix                       = var.prefix
   internal_trusted_cidr_ranges = var.internal_trusted_cidr_ranges
-  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
+  #[prefix]-[resource]-[location]-[description]-[suffix]
   name                         = "${var.prefix}-tgw-${var.default_region}"
   subnet_name                  = local.private_subnets[0].subnet_name
   vpc_name                     = module.main.network_name
@@ -56,7 +56,7 @@ resource "google_compute_route" "internet_routes" {
 
   project          = var.project_id
   network          = module.main.network_name
-  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
+  #[prefix]-[resource]-[location]-[description]-[suffix]
   name             = "${var.prefix}-rt-glb-${var.network_name}-internet"
   description      = "Transitivity route for internet"
   tags             = [module.main.network_name]
@@ -70,56 +70,13 @@ resource "google_compute_route" "internet_routes" {
  *****************************************/
 
 resource "google_compute_route" "transitivity_routes" {
-  for_each = var.mode == "hub" && var.private_svc_connect_ip !=null ? toset(var.internal_trusted_cidr_ranges) : toset([])
+  for_each = var.mode == "hub" ? toset(var.internal_trusted_cidr_ranges) : toset([])
 
   project      = var.project_id
-  network      = var.network_name
-  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
+  network      = module.main.network_name
+  #[prefix]-[resource]-[location]-[description]-[suffix]
   name         = "${var.prefix}-rt-glb-${var.network_name}-${replace(replace(each.value, "/", "-"), ".", "-")}"
-  description  = "Transitivity route for ${each.value}"
+  description  = "Transitivity route for range ${each.value}"
   dest_range   = each.value
   next_hop_ilb = module.transitivity_gateway.0.ilb_id
-}
-
-/*
- * Service connect
- */
-
-resource "google_compute_service_attachment" "svc_attachment" {
-  count       = var.mode == "hub" ? 1 : 0
-  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
-  name        = "${var.prefix}-tgw-${var.default_region}"
-  region      = var.default_region
-  project     = var.project_id
-  description = "Transit gateway service attachment"
-
-  enable_proxy_protocol = false
-  connection_preference = "ACCEPT_AUTOMATIC"
-  nat_subnets           = [for subnet in data.google_compute_subnetwork.private_svc_connect_subnet : subnet.id]
-  target_service        = module.transitivity_gateway.0.ilb_id
-}
-
-// Forwarding rule for VPC private service connect
-resource "google_compute_forwarding_rule" "svc_endpoint" {
-  count       = var.mode == "spoke" ? 1 : 0
-
-  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
-  name                  = "${var.prefix}-frule-${var.default_region}-svcenvpoint"
-  project     = var.project_id
-  region                = var.default_region
-  load_balancing_scheme = ""
-  target                = var.org_nethub_tgw_service_attachment_id
-  network               = module.main.network_name
-  ip_address            = google_compute_address.svc_endpoint_ip.0.id
-}
-
-resource "google_compute_address" "svc_endpoint_ip" {
-  count       = var.mode == "spoke" ? 1 : 0
-
-  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
-  name         = "${var.prefix}-ip-${var.default_region}-svcenvpoint"
-  project     = var.project_id
-  region       = var.default_region
-  subnetwork   = local.private_subnets[0].subnet_name
-  address_type = "INTERNAL"
 }

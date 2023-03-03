@@ -6,7 +6,7 @@ resource "google_dns_policy" "default_policy" {
   count = var.mode == "hub" ? 1 : 0
 
   project                   = var.project_id
-  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
+  #[prefix]-[resource]-[location]-[description]-[suffix]
   name                      = "${var.prefix}-dp-glb-dns-hub-default-policy"
   enable_inbound_forwarding = var.dns_enable_inbound_forwarding
   enable_logging            = var.dns_enable_logging
@@ -27,7 +27,7 @@ module "dns-forwarding-zone" {
 
   project_id = var.project_id
   type       = "forwarding"
-  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
+  #[prefix]-[resource]-[location]-[description]-[suffix]
   name       = "${var.prefix}-fz-glb-dns-hub"
   domain     = var.domain
 

@@ -27,9 +27,3 @@ output "subnets_secondary_ranges" {
   value       = module.main.subnets_secondary_ranges
   description = "The secondary ranges associated with these subnets"
 }
-
-
-output "tgw_service_attachment_id" {
-  description = "Service attachment id for the transit gateway. Required en spoke mode"
-  value = var.mode == "hub" ? google_compute_service_attachment.svc_attachment.0.id : null
-}

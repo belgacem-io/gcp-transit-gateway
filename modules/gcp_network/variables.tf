@@ -56,7 +56,6 @@ variable "nat_num_addresses_region1" {
 
 variable "public_subnets" {
   type = list(object({
-    project_name = string
     subnet_name  = string
     subnet_ip    = string
   }))
@@ -66,7 +65,6 @@ variable "public_subnets" {
 
 variable "private_subnets" {
   type = list(object({
-    project_name = string
     subnet_name  = string
     subnet_ip    = string
   }))
@@ -76,7 +74,6 @@ variable "private_subnets" {
 
 variable "data_subnets" {
   type = list(object({
-    project_name = string
     subnet_name  = string
     subnet_ip    = string
   }))
@@ -86,7 +83,6 @@ variable "data_subnets" {
 
 variable "private_svc_connect_subnets" {
   type = list(object({
-    project_name = string
     subnet_name  = string
     subnet_ip    = string
   }))
@@ -201,6 +197,12 @@ variable "network_internet_egress_tag" {
   default     = "egress-internet"
 }
 
+variable "bgp_asn_subnet" {
+  type        = number
+  description = "BGP ASN for Subnets cloud routers."
+  default = 64514
+}
+
 variable "internal_trusted_cidr_ranges" {
   description = "Internal trusted ip ranges. Must be set to private ip ranges"
   type        = list(string)
@@ -217,10 +219,4 @@ variable "org_nethub_vpc_self_link" {
   type        = string
   default     = null
   description = "Organization hub network VPC self link. Required en spoke mode"
-}
-
-variable "org_nethub_tgw_service_attachment_id" {
-  type        = string
-  default     = null
-  description = "Service attachment id for the transit gateway. Required en spoke mode"
 }
