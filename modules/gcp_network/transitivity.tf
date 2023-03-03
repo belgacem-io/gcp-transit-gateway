@@ -98,3 +98,28 @@ resource "google_compute_service_attachment" "svc_attachment" {
   nat_subnets           = [for subnet in data.google_compute_subnetwork.private_svc_connect_subnet : subnet.id]
   target_service        = module.transitivity_gateway.0.ilb_id
 }
+
+// Forwarding rule for VPC private service connect
+resource "google_compute_forwarding_rule" "svc_endpoint" {
+  count       = var.mode == "spoke" ? 1 : 0
+
+  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
+  name                  = "${var.prefix}-frule-${var.default_region}-svcenvpoint"
+  project     = var.project_id
+  region                = var.default_region
+  load_balancing_scheme = ""
+  target                = var.org_nethub_tgw_service_attachment_id
+  network               = module.main.network_name
+  ip_address            = google_compute_address.svc_endpoint_ip.0.id
+}
+
+resource "google_compute_address" "svc_endpoint_ip" {
+  count       = var.mode == "spoke" ? 1 : 0
+
+  #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
+  name         = "${var.prefix}-ip-${var.default_region}-svcenvpoint"
+  project     = var.project_id
+  region       = var.default_region
+  subnetwork   = local.private_subnets[0].subnet_name
+  address_type = "INTERNAL"
+}

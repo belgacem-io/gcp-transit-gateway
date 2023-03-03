@@ -79,6 +79,7 @@
 | <a name="input_network_internet_egress_tag"></a> [network\_internet\_egress\_tag](#input\_network\_internet\_egress\_tag) | Network tags for VMs with internet access. | `string` | `"egress-internet"` | no |
 | <a name="input_optional_fw_rules_enabled"></a> [optional\_fw\_rules\_enabled](#input\_optional\_fw\_rules\_enabled) | Toggle creation of optional firewall rules: IAP SSH, IAP RDP and Internal & Global load balancing health check and load balancing IP ranges. | `bool` | `false` | no |
 | <a name="input_org_nethub_project_id"></a> [org\_nethub\_project\_id](#input\_org\_nethub\_project\_id) | Organization hub network project. Required en spoke mode | `string` | `null` | no |
+| <a name="input_org_nethub_tgw_service_attachment_id"></a> [org\_nethub\_tgw\_service\_attachment\_id](#input\_org\_nethub\_tgw\_service\_attachment\_id) | Service attachment id for the transit gateway. Required en spoke mode | `string` | `null` | no |
 | <a name="input_org_nethub_vpc_self_link"></a> [org\_nethub\_vpc\_self\_link](#input\_org\_nethub\_vpc\_self\_link) | Organization hub network VPC self link. Required en spoke mode | `string` | `null` | no |
 | <a name="input_private_service_cidr"></a> [private\_service\_cidr](#input\_private\_service\_cidr) | CIDR range for private service networking. Used for Cloud SQL and other managed services. | `string` | `null` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | The list of private subnets being created | <pre>list(object({<br>    project_name = string<br>    subnet_name  = string<br>    subnet_ip    = string<br>  }))</pre> | `[]` | no |
@@ -100,4 +101,5 @@
 | <a name="output_subnets_names"></a> [subnets\_names](#output\_subnets\_names) | The names of the subnets being created |
 | <a name="output_subnets_secondary_ranges"></a> [subnets\_secondary\_ranges](#output\_subnets\_secondary\_ranges) | The secondary ranges associated with these subnets |
 | <a name="output_subnets_self_links"></a> [subnets\_self\_links](#output\_subnets\_self\_links) | The self-links of subnets being created |
+| <a name="output_tgw_service_attachment_id"></a> [tgw\_service\_attachment\_id](#output\_tgw\_service\_attachment\_id) | Service attachment id for the transit gateway. Required en spoke mode |
 <!-- END_TF_DOCS -->

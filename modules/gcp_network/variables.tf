@@ -218,3 +218,9 @@ variable "org_nethub_vpc_self_link" {
   default     = null
   description = "Organization hub network VPC self link. Required en spoke mode"
 }
+
+variable "org_nethub_tgw_service_attachment_id" {
+  type        = string
+  default     = null
+  description = "Service attachment id for the transit gateway. Required en spoke mode"
+}
