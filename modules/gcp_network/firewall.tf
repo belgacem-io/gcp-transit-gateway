@@ -270,5 +270,5 @@ resource "google_compute_firewall" "internet" {
   }
 
   source_ranges = ["0.0.0.0/0"]
-  target_tags   = [var.tgw_internet_egress_tag,local.nat_internet_tag]
+  target_tags   = [var.net_tag_internet_egress]
 }

@@ -191,10 +191,10 @@ variable "subnetworks_enable_logging" {
   default     = false
 }
 
-variable "tgw_internet_egress_tag" {
+variable "net_tag_internet_egress" {
   type        = string
   description = "Network tags for VMs with internet access."
-  default     = "tgw-egress-internet"
+  default     = "restricted-egress-internet"
 }
 
 variable "bgp_asn_subnet" {

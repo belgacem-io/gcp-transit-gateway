@@ -1,6 +1,5 @@
 locals {
   private_googleapis_cidr = "199.36.153.8/30"
-  nat_internet_tag        = "direct-egress-internet"
   public_subnets          = [
     for subnet in var.public_subnets : {
       #[prefix]-[resource]-[location]-[description]-[suffix]
@@ -79,19 +78,6 @@ module "main" {
         priority          = "1000"
       }
     ] : [],
-    var.nat_enabled ?
-    [
-      {
-        #[prefix]-[resource]-[location]-[description]-[suffix]
-        name              = "${var.prefix}-rt-glb-100-direct-egress-internet"
-        description       = "Tag based route through IGW to access internet"
-        destination_range = "0.0.0.0/0"
-        tags              = local.nat_internet_tag
-        next_hop_internet = "true"
-        priority          = "100"
-      }
-    ]
-    : [],
     var.nat_enabled && var.windows_activation_enabled ?
     [
       {

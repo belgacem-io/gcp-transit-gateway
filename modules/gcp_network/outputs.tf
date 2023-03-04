@@ -28,7 +28,7 @@ output "subnets_secondary_ranges" {
   description = "The secondary ranges associated with these subnets"
 }
 
-output "network_internet_egress_tag" {
+output "net_tag_internet_egress" {
   description = "Network tags for VMs with internet access."
-  value       = var.tgw_internet_egress_tag
+  value       = var.net_tag_internet_egress
 }

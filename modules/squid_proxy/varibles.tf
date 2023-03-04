@@ -107,11 +107,6 @@ variable "autoscaling_enabled" {
   default     = false
 }
 
-variable "network_internet_egress_tag" {
-  type        = string
-  description = "Network tags for VMs with internet access."
-}
-
 variable "authorized_ports" {
   type        = list(string)
   description = "List of safe ports."

@@ -32,7 +32,7 @@ module "nethub_bastion" {
   project_id                  = var.project_id
   region                      = var.default_region
   subnet_self_link            = module.nethub.subnets_self_links[0]
-  network_internet_egress_tag = module.nethub.network_internet_egress_tag
+  network_internet_egress_tag = module.nethub.net_tag_internet_egress
 
   depends_on = [
     module.nethub
@@ -70,7 +70,7 @@ module "netspoke1_bastion" {
   project_id                  = var.project_id
   region                      = var.default_region
   subnet_self_link            = module.netspoke1.subnets_self_links[0]
-  network_internet_egress_tag = module.nethub.network_internet_egress_tag
+  network_internet_egress_tag = module.nethub.net_tag_internet_egress
 
   depends_on = [
     module.netspoke1
@@ -108,7 +108,7 @@ module "netspoke2_bastion" {
   project_id                  = var.project_id
   region                      = var.default_region
   subnet_self_link            = module.netspoke2.subnets_self_links[0]
-  network_internet_egress_tag = module.nethub.network_internet_egress_tag
+  network_internet_egress_tag = module.nethub.net_tag_internet_egress
 
   depends_on = [
     module.netspoke2

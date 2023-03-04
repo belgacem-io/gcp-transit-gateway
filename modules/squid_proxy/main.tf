@@ -40,7 +40,7 @@ module "squid_proxy_template" {
   source_image_family  = split("/", var.instance_image)[1]
   source_image_project = split("/", var.instance_image)[0]
 
-  tags = [var.network_internet_egress_tag, var.name]
+  tags = [var.name]
 
   depends_on = [
     module.squid_proxy_service_account
