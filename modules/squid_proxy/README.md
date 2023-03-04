@@ -12,6 +12,7 @@
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The project id of your GCP project | `string` | n/a | yes |
 | <a name="input_subnet_name"></a> [subnet\_name](#input\_subnet\_name) | The subnet in the VPC for the proxy cluster to be deployed to. | `string` | n/a | yes |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | The GCP VPC network name for the cluster to be built in. | `string` | n/a | yes |
+| <a name="input_authorized_members"></a> [authorized\_members](#input\_authorized\_members) | List of members in the standard GCP form: user:{email}, serviceAccount:{email}, group:{email} | `list(string)` | `[]` | no |
 | <a name="input_authorized_ports"></a> [authorized\_ports](#input\_authorized\_ports) | List of safe ports. | `list(string)` | <pre>[<br>  "80",<br>  "443",<br>  "21",<br>  "3128"<br>]</pre> | no |
 | <a name="input_autoscaling_cpu"></a> [autoscaling\_cpu](#input\_autoscaling\_cpu) | Autoscaling, cpu utilization policy block as single element array. https://www.terraform.io/docs/providers/google/r/compute_autoscaler#cpu_utilization | `list(map(number))` | `[]` | no |
 | <a name="input_autoscaling_enabled"></a> [autoscaling\_enabled](#input\_autoscaling\_enabled) | Creates an autoscaler for the managed instance group | `bool` | `false` | no |
