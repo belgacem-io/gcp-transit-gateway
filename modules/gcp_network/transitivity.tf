@@ -5,6 +5,7 @@ module "transitivity_gateway" {
   source = "../gcp_network_transitivity"
 
   environment_code             = var.environment_code
+  mode                         = var.mode
   project_id                   = var.project_id
   default_region               = var.default_region
   prefix                       = var.prefix
