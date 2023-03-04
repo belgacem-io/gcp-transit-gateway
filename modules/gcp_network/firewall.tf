@@ -250,3 +250,25 @@ resource "google_compute_firewall" "allow_all_ingress" {
 
   source_ranges = var.allow_all_ingress_ranges
 }
+
+/******************************************
+  Firewall to internet
+ *****************************************/
+resource "google_compute_firewall" "internet" {
+  count = var.mode == "hub" ? 1 : 0
+
+  #[prefix]-[resource]-[location]-[description]-[suffix]
+  name      = "${var.prefix}-fw-glb-egress-internet"
+  project   = var.project_id
+  network   = module.main.network_name
+  direction = "EGRESS"
+  allow {
+    protocol = "tcp"
+  }
+  allow {
+    protocol = "udp"
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = [var.tgw_internet_egress_tag,local.nat_internet_tag]
+}

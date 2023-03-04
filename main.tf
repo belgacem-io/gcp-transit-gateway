@@ -16,11 +16,11 @@ module "nethub" {
   dns_enable_inbound_forwarding = false
   nat_enabled                   = true
 
-  public_subnets              = var.hub_public_subnets
-  private_subnets             = var.hub_private_subnets
-  private_svc_connect_subnets = var.hub_private_svc_connect_subnets
-
-  allow_all_egress_ranges     = concat(var.spoke1_private_subnets.*.subnet_ip,var.spoke2_private_subnets.*.subnet_ip)
+  public_subnets                  = var.hub_public_subnets
+  private_subnets                 = var.hub_private_subnets
+  private_svc_connect_subnets     = var.hub_private_svc_connect_subnets
+  allow_all_egress_ranges         = concat(var.spoke1_private_subnets.*.subnet_ip, var.spoke2_private_subnets.*.subnet_ip)
+  allow_all_ingress_ranges        = concat(var.spoke1_private_subnets.*.subnet_ip, var.spoke2_private_subnets.*.subnet_ip)
 }
 
 module "nethub_bastion" {
@@ -53,6 +53,8 @@ module "netspoke1" {
   org_nethub_vpc_self_link      = module.nethub.network_self_link
 
   private_subnets = var.spoke1_private_subnets
+  allow_all_egress_ranges         = ["0.0.0.0/0"]
+  allow_all_ingress_ranges        = concat(var.hub_private_subnets.*.subnet_ip,var.hub_public_subnets.*.subnet_ip, var.spoke2_private_subnets.*.subnet_ip)
 
   depends_on = [
     module.nethub
@@ -69,8 +71,7 @@ module "netspoke1_bastion" {
   project_id         = var.project_id
   region             = var.default_region
   subnet_self_link   = module.netspoke1.subnets_self_links[0]
-
-  depends_on = [
+   depends_on = [
     module.netspoke1
   ]
 }
@@ -89,6 +90,8 @@ module "netspoke2" {
   org_nethub_vpc_self_link      = module.nethub.network_self_link
 
   private_subnets = var.spoke2_private_subnets
+  allow_all_egress_ranges         = ["0.0.0.0/0"]
+  allow_all_ingress_ranges        = concat(var.hub_private_subnets.*.subnet_ip,var.hub_public_subnets.*.subnet_ip, var.spoke1_private_subnets.*.subnet_ip)
 
   depends_on = [
     module.nethub

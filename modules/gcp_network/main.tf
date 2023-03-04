@@ -1,5 +1,6 @@
 locals {
   private_googleapis_cidr = "199.36.153.8/30"
+  nat_internet_tag        = "direct-egress-internet"
   public_subnets          = [
     for subnet in var.public_subnets : {
       #[prefix]-[resource]-[location]-[description]-[suffix]
@@ -82,11 +83,12 @@ module "main" {
     [
       {
         #[prefix]-[resource]-[location]-[description]-[suffix]
-        name              = "${var.prefix}-rt-glb-1000-egress-internet-default"
+        name              = "${var.prefix}-rt-glb-100-direct-egress-internet"
         description       = "Tag based route through IGW to access internet"
         destination_range = "0.0.0.0/0"
+        tags              = local.nat_internet_tag
         next_hop_internet = "true"
-        priority          = "1000"
+        priority          = "100"
       }
     ]
     : [],
@@ -103,26 +105,4 @@ module "main" {
     ]
     : []
   )
-}
-
-/******************************************
-  Firewall to internet
- *****************************************/
-resource "google_compute_firewall" "internet" {
-  count = var.mode == "hub" ? 1 : 0
-
-  #[prefix]-[resource]-[location]-[description]-[suffix]
-  name      = "${var.prefix}-fw-glb-egress-internet-default"
-  project   = var.project_id
-  network   = module.main.network_name
-  direction = "EGRESS"
-  allow {
-    protocol = "tcp"
-  }
-  allow {
-    protocol = "udp"
-  }
-
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = [var.network_internet_egress_tag]
 }

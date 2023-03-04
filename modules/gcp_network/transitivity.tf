@@ -28,7 +28,7 @@ module "transitivity_gateway" {
   name                         = "${var.prefix}-tgw-${var.default_region}"
   subnet_name                  = local.private_subnets[0].subnet_name
   vpc_name                     = module.main.network_name
-  network_internet_egress_tag  = var.network_internet_egress_tag
+  network_internet_egress_tag  = local.nat_internet_tag
 
   depends_on = [
     module.main
@@ -53,10 +53,10 @@ module "private_service_connect" {
 
 
 /******************************************
-  Mandatory firewall rules
+  Transitivity Routes
  *****************************************/
 
-resource "google_compute_route" "transitivity_routes" {
+resource "google_compute_route" "transitivity_routes_trusted" {
   for_each = var.mode == "hub" ? toset(var.internal_trusted_cidr_ranges) : toset([])
 
   project      = var.project_id
@@ -65,5 +65,18 @@ resource "google_compute_route" "transitivity_routes" {
   name         = "${var.prefix}-rt-glb-${var.network_name}-${replace(replace(each.value, "/", "-"), ".", "-")}"
   description  = "Transitivity route for range ${each.value}"
   dest_range   = each.value
+  next_hop_ilb = module.transitivity_gateway.0.ilb_id
+}
+
+resource "google_compute_route" "transitivity_route_internet" {
+  count = var.mode == "hub" ? 1 : 0
+
+  project      = var.project_id
+  network      = module.main.network_name
+  #[prefix]-[resource]-[location]-[description]-[suffix]
+  name         = "${var.prefix}-rt-glb-${var.network_name}-internet"
+  description  = "Transitivity route for range internet"
+  #tags = [var.tgw_internet_egress_tag]
+  dest_range   = "0.0.0.0/0"
   next_hop_ilb = module.transitivity_gateway.0.ilb_id
 }
