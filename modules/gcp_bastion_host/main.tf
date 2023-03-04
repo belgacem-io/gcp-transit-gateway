@@ -17,6 +17,7 @@ module "instance_template" {
     email  = google_service_account.vm_sa.email
     scopes = ["cloud-platform"]
   }
+  tags = [var.network_internet_egress_tag]
   metadata = {
     enable-oslogin = "TRUE"
   }
