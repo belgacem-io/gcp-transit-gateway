@@ -107,6 +107,12 @@ variable "autoscaling_enabled" {
   default     = false
 }
 
+variable "network_tags" {
+  type        = list(string)
+  description = "Network tags for VMs."
+  default = []
+}
+
 variable "authorized_ports" {
   type        = list(string)
   description = "List of safe ports."
