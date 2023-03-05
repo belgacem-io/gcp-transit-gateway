@@ -14,19 +14,45 @@
    export PROJECT_NAME=poc-tgw
 
    ```
-4. Setup your local environment
-   ```sh
-    make up
-    ./terraformd --insall
+4. Create your terraform.tfvars
+   ```hcl
+   project_id         = "poc-tgw"
+   default_region     = "europe-west9"
+   hub_public_subnets = [
+     {
+       subnet_name = "public"
+       subnet_ip   = "192.168.0.0/24"
+     }
+   ]
+   
+   hub_private_subnets = [
+     {
+       subnet_name = "private"
+       subnet_ip   = "192.168.1.0/24"
+     }
+   ]
+   
+   hub_private_svc_connect_subnets = [
+     {
+       subnet_name = "svcc"
+       subnet_ip   = "192.168.2.0/24"
+     }
+   ]
+   spoke1_private_subnets     = [
+     {
+       subnet_name = "private"
+       subnet_ip   = "10.0.1.0/24"
+     }
+   ]
    ```
 
 5. Init terraform modules
    ```sh
-    terraformd init
+    terraform init
    ```
 6. Apply terraform resources
    ```sh
-    terraformd apply
+    terraform apply
    ```
 
 ## Inputs
