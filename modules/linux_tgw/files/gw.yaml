@@ -13,7 +13,7 @@ runcmd:
   # Accept all ICMP (troubleshooting)
   - iptables -A INPUT -p icmp -j ACCEPT
   # Accept SSH local traffic to the eth0 interface (health checking)
-  - iptables -A INPUT -p tcp --dport 22 -d $(curl -H \"Metadata-Flavor: Google\" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip) -j ACCEPT
+  - iptables -A INPUT -p tcp --dport 22 -d $(hostname -I | awk '{print $1}') -j ACCEPT
   # Drop everything else
   - iptables -A INPUT -j DROP
   # Accept all return transit traffic for established flows
@@ -24,4 +24,4 @@ runcmd:
   # Drop everything else
   - iptables -A FORWARD -j DROP
   # SNAT traffic not to the local eth0 interface
-  - iptables -t nat -A POSTROUTING ! -d $(curl -H \"Metadata-Flavor: Google\" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip) -j MASQUERADE
+  - iptables -t nat -A POSTROUTING ! -d $(hostname -I | awk '{print $1}') -j MASQUERADE

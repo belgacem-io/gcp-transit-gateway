@@ -1,7 +1,6 @@
 .terraform.lock.hcl
 .terraform/
 terraform.tfstate
-terraform.tfstate1.backup
 .idea/*
 .build
 .tls/*
@@ -10,3 +9,4 @@ terraform.tfvars
 .auth/
 .terraform.tfstate.lock.info
 /.auth/*
+/terraform.tfstate.backup

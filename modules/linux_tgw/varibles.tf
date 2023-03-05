@@ -42,7 +42,7 @@ variable "instance_type" {
 variable "instance_image" {
   description = "The instance image. Must be debian base."
   type        = string
-  default     = "cos-cloud/cos-stable-93-16623-102-23"
+  default     = "ubuntu-os-cloud/ubuntu-minimal-1804-lts"
 }
 
 variable "max_replicas" {
