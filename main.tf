@@ -18,8 +18,9 @@ module "nethub" {
   public_subnets                = var.hub_public_subnets
   private_subnets               = var.hub_private_subnets
   private_svc_connect_subnets   = var.hub_private_svc_connect_subnets
-  allow_all_egress_ranges       = concat(var.spoke1_private_subnets.*.subnet_ip, var.spoke2_private_subnets.*.subnet_ip)
-  allow_all_ingress_ranges      = concat(var.spoke1_private_subnets.*.subnet_ip, var.spoke2_private_subnets.*.subnet_ip)
+  allow_all_egress_ranges       = ["0.0.0.0/0"]
+  allow_all_ingress_ranges      = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
 }
 
 module "nethub_bastion" {
@@ -53,7 +54,8 @@ module "netspoke1" {
   org_nethub_vpc_self_link      = module.nethub.network_self_link
   private_subnets               = var.spoke1_private_subnets
   allow_all_egress_ranges       = ["0.0.0.0/0"]
-  allow_all_ingress_ranges      = concat(var.hub_private_subnets.*.subnet_ip, var.hub_public_subnets.*.subnet_ip, var.spoke2_private_subnets.*.subnet_ip)
+  allow_all_ingress_ranges      = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
 
   depends_on = [
     module.nethub
@@ -91,7 +93,8 @@ module "netspoke2" {
   org_nethub_vpc_self_link      = module.nethub.network_self_link
   private_subnets               = var.spoke2_private_subnets
   allow_all_egress_ranges       = ["0.0.0.0/0"]
-  allow_all_ingress_ranges      = concat(var.hub_private_subnets.*.subnet_ip, var.hub_public_subnets.*.subnet_ip, var.spoke1_private_subnets.*.subnet_ip)
+  allow_all_ingress_ranges      = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
 
   depends_on = [
     module.nethub

@@ -206,7 +206,6 @@ variable "bgp_asn_subnet" {
 variable "internal_trusted_cidr_ranges" {
   description = "Internal trusted ip ranges. Must be set to private ip ranges"
   type        = list(string)
-  default     = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
 }
 
 variable "org_nethub_project_id" {
