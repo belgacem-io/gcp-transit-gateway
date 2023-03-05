@@ -4,7 +4,7 @@
 resource "google_compute_firewall" "allow_ingress" {
   #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
   name      = "${var.prefix}-fw-glb-allow-squid-ingress"
-  network   = var.vpc_name
+  network   = var.network_name
   project   = var.project_id
   direction = "INGRESS"
   priority  = 1000
@@ -25,14 +25,14 @@ resource "google_compute_firewall" "allow_ingress" {
     protocol = "all"
   }
 
-  source_ranges           = var.internal_trusted_cidr_ranges
+  source_ranges           = var.source_trusted_cidr_ranges
   target_service_accounts = module.service_account.emails_list
 }
 
 resource "google_compute_firewall" "allow_egress" {
   #[prefix]-[project]-[env]-[resource]-[location]-[description]-[suffix]
   name      = "${var.prefix}-fw-glb-allow-squid-egress"
-  network   = var.vpc_name
+  network   = var.network_name
   project   = var.project_id
   direction = "EGRESS"
   priority  = 1000
@@ -53,7 +53,7 @@ resource "google_compute_firewall" "allow_egress" {
     protocol = "all"
   }
 
-  destination_ranges      = var.internal_trusted_cidr_ranges
+  destination_ranges      = var.source_trusted_cidr_ranges
   target_service_accounts = module.service_account.emails_list
 }
 
@@ -71,7 +71,7 @@ module "iap_tunneling" {
   #[prefix]-[resource]-[location]-[description]-[suffix]
   fw_name_allow_ssh_from_iap = "${var.prefix}-iap-glb-allow-iap-to-tunnel"
   project                    = var.project_id
-  network                    = var.vpc_name
+  network                    = var.network_name
   service_accounts           = module.service_account.emails_list
   instances                  = []
   members                    = var.authorized_members

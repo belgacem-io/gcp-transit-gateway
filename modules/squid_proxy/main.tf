@@ -19,8 +19,8 @@ module "proxy_template" {
   can_ip_forward     = true
   disk_size_gb       = 10
   name_prefix        = "${var.prefix}-tpl-squid"
-  network            = var.vpc_name
-  subnetwork         = var.subnet_name
+  network            = var.network_name
+  subnetwork         = var.subnetwork_name
   subnetwork_project = var.project_id
   machine_type       = var.instance_type
   service_account    = {
@@ -29,11 +29,11 @@ module "proxy_template" {
   }
   metadata = {
     squid-conf = templatefile("${path.module}/files/squid.conf", {
-      trusted_cidr_ranges = var.internal_trusted_cidr_ranges
+      trusted_cidr_ranges = var.source_trusted_cidr_ranges
       safe_ports          = var.authorized_ports
     })
     startup-script = templatefile("${path.module}/files/startup.sh", {
-      trusted_cidr_ranges = var.internal_trusted_cidr_ranges
+      trusted_cidr_ranges = var.source_trusted_cidr_ranges
       safe_ports          = var.authorized_ports
     })
   }
@@ -83,8 +83,8 @@ module "proxy_ilbs" {
   ports                   = null
   all_ports               = true
   global_access           = true
-  network                 = var.vpc_name
-  subnetwork              = var.subnet_name
+  network                 = var.network_name
+  subnetwork              = var.subnetwork_name
   target_service_accounts = module.service_account.emails_list
   source_tags             = null
   target_tags             = null

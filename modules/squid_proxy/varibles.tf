@@ -13,12 +13,12 @@ variable "default_region" {
   description = "Default region 1 for subnets and Cloud Routers"
 }
 
-variable "vpc_name" {
+variable "network_name" {
   description = "The GCP VPC network name for the cluster to be built in."
   type        = string
 }
 
-variable "subnet_name" {
+variable "subnetwork_name" {
   description = "The subnet in the VPC for the proxy cluster to be deployed to."
   type        = string
 }
@@ -28,8 +28,13 @@ variable "environment_code" {
   type        = string
 }
 
-variable "internal_trusted_cidr_ranges" {
+variable "source_trusted_cidr_ranges" {
   description = "Your internal CIDR range requiring access to this proxy."
+  type        = list(string)
+}
+
+variable "destination_trusted_cidr_ranges" {
+  description = "Your internal/external CIDR range requiring access from this proxy."
   type        = list(string)
 }
 

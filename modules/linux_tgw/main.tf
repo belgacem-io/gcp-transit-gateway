@@ -2,10 +2,6 @@
  * Hub & Spoke Peering Transitivity with Gateway VMs
  */
 
-locals {
-  stripped_vpc_name = replace(var.vpc_name, "vpc-", "")
-}
-
 module "service_account" {
   source  = "terraform-google-modules/service-accounts/google"
   version = "~> 4.1"
@@ -22,13 +18,13 @@ module "tgw_template" {
   source  = "terraform-google-modules/vm/google//modules/instance_template"
   version = "~> 8.0"
 
-  can_ip_forward = true
-  disk_size_gb   = 10
-  name_prefix    = "${var.prefix}-tpl-linuxtgwt"
-  network        = var.vpc_name
-  project_id     = var.project_id
-  region         = var.default_region
-  subnetwork         = var.subnet_name
+  can_ip_forward     = true
+  disk_size_gb       = 10
+  name_prefix        = "${var.prefix}-tpl-linuxtgwt"
+  network            = var.network_name
+  project_id         = var.project_id
+  region             = var.default_region
+  subnetwork         = var.subnetwork_name
   subnetwork_project = var.project_id
   machine_type       = var.instance_type
 
@@ -38,8 +34,9 @@ module "tgw_template" {
   }
 
   metadata = {
-    user-data              = templatefile("${path.module}/files/gw.yaml", {
-      trusted_ip_ranges = join(",", var.internal_trusted_cidr_ranges)
+    user-data = templatefile("${path.module}/files/gw.yaml", {
+      source_trusted_ip_ranges      = join(",", var.source_trusted_cidr_ranges),
+      destination_trusted_ip_ranges = join(",", var.destination_trusted_cidr_ranges),
     })
     block-project-ssh-keys = "true"
   }
@@ -54,11 +51,11 @@ module "migs" {
   source  = "terraform-google-modules/vm/google//modules/mig"
   version = "~> 8.0"
 
-  project_id        = var.project_id
-  region            = var.default_region
+  project_id                   = var.project_id
+  region                       = var.default_region
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  hostname          = "${var.prefix}-mig-${var.default_region}-linuxtgwt"
-  instance_template = module.tgw_template.self_link
+  hostname                     = "${var.prefix}-mig-${var.default_region}-linuxtgwt"
+  instance_template            = module.tgw_template.self_link
   /* autoscaler */
   autoscaling_enabled          = var.autoscaling_enabled
   max_replicas                 = var.max_replicas
@@ -69,7 +66,7 @@ module "migs" {
   autoscaling_lb               = var.autoscaling_lb
   autoscaling_scale_in_control = var.autoscaling_scale_in_control
 
-  update_policy     = var.update_policy
+  update_policy = var.update_policy
 }
 
 module "ilbs" {
@@ -82,8 +79,8 @@ module "ilbs" {
   ports                   = null
   all_ports               = true
   global_access           = true
-  network                 = var.vpc_name
-  subnetwork              = var.subnet_name
+  network                 = var.network_name
+  subnetwork              = var.subnetwork_name
   firewall_enable_logging = true
   target_service_accounts = [module.service_account.email]
   source_tags             = null

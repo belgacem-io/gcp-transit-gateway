@@ -9,14 +9,15 @@ module "squid_gateway" {
 
   count = var.mode == "squid" ? 1 : 0
 
-  environment_code             = var.environment_code
-  project_id                   = var.project_id
-  default_region               = var.default_region
-  prefix                       = var.prefix
-  internal_trusted_cidr_ranges = var.internal_trusted_cidr_ranges
-  subnet_name                  = var.subnetwork_name
-  vpc_name                     = var.network_name
-  network_tags                 = local.network_egress_internet_tags
+  environment_code                = var.environment_code
+  project_id                      = var.project_id
+  default_region                  = var.default_region
+  prefix                          = var.prefix
+  source_trusted_cidr_ranges      = var.internal_trusted_cidr_ranges
+  destination_trusted_cidr_ranges = ["0.0.0.0/0"]
+  subnetwork_name                 = var.subnetwork_name
+  network_name                    = var.network_name
+  network_tags                    = local.network_egress_internet_tags
 }
 
 /******************************************
@@ -27,14 +28,15 @@ module "linux_gateway" {
 
   count = var.mode == "linux" ? 1 : 0
 
-  environment_code             = var.environment_code
-  project_id                   = var.project_id
-  default_region               = var.default_region
-  prefix                       = var.prefix
-  internal_trusted_cidr_ranges = var.internal_trusted_cidr_ranges
-  subnet_name                  = var.subnetwork_name
-  vpc_name                     = var.network_name
-  network_tags                 = local.network_egress_internet_tags
+  environment_code                = var.environment_code
+  project_id                      = var.project_id
+  default_region                  = var.default_region
+  prefix                          = var.prefix
+  source_trusted_cidr_ranges      = var.internal_trusted_cidr_ranges
+  destination_trusted_cidr_ranges = ["0.0.0.0/0"]
+  subnetwork_name                 = var.subnetwork_name
+  network_name                    = var.network_name
+  network_tags                    = local.network_egress_internet_tags
 }
 
 /******************************************
@@ -43,12 +45,12 @@ module "linux_gateway" {
 resource "google_compute_firewall" "tgw_internet" {
 
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name      = "${var.prefix}-fw-glb-${var.mode}-tgw-internal-internet"
+  name        = "${var.prefix}-fw-glb-${var.mode}-tgw-internal-internet"
   description = "Transit Gateway to internet firewall"
-  project   = var.project_id
-  network   = var.network_name
-  priority  = 100
-  direction = "EGRESS"
+  project     = var.project_id
+  network     = var.network_name
+  priority    = 100
+  direction   = "EGRESS"
   allow {
     protocol = "tcp"
   }
