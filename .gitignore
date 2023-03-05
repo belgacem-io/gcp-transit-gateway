@@ -1,7 +1,7 @@
 .terraform.lock.hcl
 .terraform/
 terraform.tfstate
-terraform.tfstate.*
+terraform.tfstate1.backup
 .idea/*
 .build
 .tls/*

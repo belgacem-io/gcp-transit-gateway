@@ -1,63 +1,63 @@
+/*
+ * Hub & Spoke Peering Transitivity with Gateway VMs
+ */
+
+locals {
+  stripped_vpc_name = replace(var.vpc_name, "vpc-", "")
+}
+
 module "service_account" {
   source  = "terraform-google-modules/service-accounts/google"
-  version = "~> 4.2"
+  version = "~> 4.1"
 
   project_id    = var.project_id
-  names         = ["squid-proxy"]
+  names         = ["linux-tgw"]
   project_roles = [
     "${var.project_id}=>roles/logging.logWriter",
     "${var.project_id}=>roles/monitoring.metricWriter",
   ]
 }
 
-module "proxy_template" {
+module "tgw_template" {
   source  = "terraform-google-modules/vm/google//modules/instance_template"
-  version = "~> 7.3"
+  version = "~> 8.0"
 
-  project_id         = var.project_id
-  region             = var.default_region
-  can_ip_forward     = true
-  disk_size_gb       = 10
-  name_prefix        = var.prefix
-  network            = var.vpc_name
+  can_ip_forward = true
+  disk_size_gb   = 10
+  name_prefix    = var.prefix
+  network        = var.vpc_name
+  project_id     = var.project_id
+  region         = var.default_region
   subnetwork         = var.subnet_name
   subnetwork_project = var.project_id
   machine_type       = var.instance_type
-  service_account    = {
-    email  = module.service_account.emails_list[0]
+
+  service_account = {
+    email  = module.service_account.email
     scopes = ["cloud-platform"]
   }
+
   metadata = {
-    squid-conf = templatefile("${path.module}/files/squid.conf", {
-      trusted_cidr_ranges = var.internal_trusted_cidr_ranges
-      safe_ports          = var.authorized_ports
+    user-data              = templatefile("${path.module}/files/gw.yaml", {
+      trusted_ip_ranges = join(",", var.internal_trusted_cidr_ranges)
     })
-    startup-script = templatefile("${path.module}/files/startup.sh", {
-      trusted_cidr_ranges = var.internal_trusted_cidr_ranges
-      safe_ports          = var.authorized_ports
-    })
+    block-project-ssh-keys = "true"
   }
-  source_image_family  = split("/", var.instance_image)[1]
-  source_image_project = split("/", var.instance_image)[0]
 
-  tags = var.network_tags
-
-  depends_on = [
-    module.service_account
-  ]
+  source_image         = "cos-stable-93-16623-102-23"
+  source_image_project = "cos-cloud"
 }
 
-module "proxy_migs" {
-  source            = "terraform-google-modules/vm/google//modules/mig"
-  version           = "~> 7.3"
+module "migs" {
+  source  = "terraform-google-modules/vm/google//modules/mig"
+  version = "~> 8.0"
+
   project_id        = var.project_id
   region            = var.default_region
-  target_size       = var.min_replicas
+  target_size       = 3
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  hostname          = "${var.prefix}-mig-${var.default_region}-squid"
-  instance_template = module.proxy_template.self_link
-  update_policy     = var.update_policy
-
+  hostname          = "${var.prefix}-mig-${var.default_region}-linuxtgwt"
+  instance_template = module.tgw_template.self_link
   /* autoscaler */
   autoscaling_enabled          = var.autoscaling_enabled
   max_replicas                 = var.max_replicas
@@ -68,29 +68,40 @@ module "proxy_migs" {
   autoscaling_lb               = var.autoscaling_lb
   autoscaling_scale_in_control = var.autoscaling_scale_in_control
 
-  depends_on = [
-    module.proxy_template
+  update_policy     = [
+    {
+      max_surge_fixed              = 4
+      max_surge_percent            = null
+      instance_redistribution_type = "NONE"
+      max_unavailable_fixed        = 4
+      max_unavailable_percent      = null
+      min_ready_sec                = 180
+      minimal_action               = "RESTART"
+      type                         = "OPPORTUNISTIC"
+      replacement_method           = "SUBSTITUTE"
+    }
   ]
 }
 
-module "proxy_ilbs" {
+module "ilbs" {
   source  = "GoogleCloudPlatform/lb-internal/google"
   version = "~> 5.0"
 
-  project                 = var.project_id
   region                  = var.default_region
-  name                    = "${var.prefix}-ilb-${var.default_region}-squid"
+  #[prefix]-[resource]-[location]-[description]-[suffix]
+  name                    = "${var.prefix}-ilb-${var.default_region}-linuxtgwt"
   ports                   = null
   all_ports               = true
   global_access           = true
   network                 = var.vpc_name
   subnetwork              = var.subnet_name
-  target_service_accounts = module.service_account.emails_list
+  firewall_enable_logging = true
+  target_service_accounts = [module.service_account.email]
   source_tags             = null
   target_tags             = null
   create_backend_firewall = false
   backends                = [
-    { group = module.proxy_migs.instance_group, description = "" },
+    { group = module.migs.instance_group, description = "" },
   ]
 
   health_check = {
@@ -108,7 +119,5 @@ module "proxy_ilbs" {
     host                = null
     enable_log          = false
   }
-  depends_on = [
-    module.proxy_migs
-  ]
+  project = var.project_id
 }

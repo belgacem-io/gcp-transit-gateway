@@ -1,0 +1,27 @@
+#cloud-config
+write_files:
+  - path: /etc/sysctl.conf
+    permissions: "0644"
+    owner: root
+    content: |
+      net.ipv4.ip_forward = 1
+      net.ipv6.conf.all.forwarding = 1
+      net.ipv4.conf.all.accept_redirects = 0
+      net.ipv4.conf.all.send_redirects = 0
+runcmd:
+  - sysctl -p
+  # Accept all ICMP (troubleshooting)
+  - iptables -A INPUT -p icmp -j ACCEPT
+  # Accept SSH local traffic to the eth0 interface (health checking)
+  - iptables -A INPUT -p tcp --dport 22 -d $(curl -H \"Metadata-Flavor: Google\" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip) -j ACCEPT
+  # Drop everything else
+  - iptables -A INPUT -j DROP
+  # Accept all return transit traffic for established flows
+  - iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+  # Accept all transit traffic from internal ranges
+  # Replace by actual multiple source/destination/proto/ports rules for fine-grained ACLs.
+  - iptables -A FORWARD -s ${trusted_ip_ranges} -d ${trusted_ip_ranges} -j ACCEPT
+  # Drop everything else
+  - iptables -A FORWARD -j DROP
+  # SNAT traffic not to the local eth0 interface
+  - iptables -t nat -A POSTROUTING ! -d $(curl -H \"Metadata-Flavor: Google\" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip) -j MASQUERADE

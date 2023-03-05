@@ -19,7 +19,7 @@ variable "subnetwork_name" {
 
 variable "mode" {
   type        = string
-  description = "Network deployment mode, should be set to `hub` or `spoke`."
+  description = "Network deployment mode, should be set to `squid` or `linux`."
   default     = null
 }
 

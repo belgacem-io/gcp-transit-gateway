@@ -3,9 +3,10 @@
  *****************************************/
 module "transitivity_gateway" {
   source = "../gcp_network_transitivity"
+  count = var.mode == "hub" ? 1 : 0
 
   environment_code             = var.environment_code
-  mode                         = var.mode
+  mode                         = "linux"
   project_id                   = var.project_id
   default_region               = var.default_region
   prefix                       = var.prefix
