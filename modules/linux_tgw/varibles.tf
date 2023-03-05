@@ -42,9 +42,8 @@ variable "instance_type" {
 variable "instance_image" {
   description = "The instance image. Must be debian base."
   type        = string
-  default     = "ubuntu-os-cloud/ubuntu-minimal-1804-lts"
+  default     = "cos-cloud/cos-stable-93-16623-102-23"
 }
-
 
 variable "max_replicas" {
   description = "The maximum number of instances that the autoscaler can scale up to. This is required when creating or updating an autoscaler. The maximum number of replicas should not be lower than minimal number of replicas."

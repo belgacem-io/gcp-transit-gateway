@@ -24,7 +24,7 @@ module "tgw_template" {
 
   can_ip_forward = true
   disk_size_gb   = 10
-  name_prefix    = var.prefix
+  name_prefix    = "${var.prefix}-tpl-linuxtgwt"
   network        = var.vpc_name
   project_id     = var.project_id
   region         = var.default_region
@@ -44,8 +44,10 @@ module "tgw_template" {
     block-project-ssh-keys = "true"
   }
 
-  source_image         = "cos-stable-93-16623-102-23"
-  source_image_project = "cos-cloud"
+  source_image_family  = split("/", var.instance_image)[1]
+  source_image_project = split("/", var.instance_image)[0]
+
+  tags = var.network_tags
 }
 
 module "migs" {
@@ -54,7 +56,6 @@ module "migs" {
 
   project_id        = var.project_id
   region            = var.default_region
-  target_size       = 3
   #[prefix]-[resource]-[location]-[description]-[suffix]
   hostname          = "${var.prefix}-mig-${var.default_region}-linuxtgwt"
   instance_template = module.tgw_template.self_link
@@ -68,19 +69,7 @@ module "migs" {
   autoscaling_lb               = var.autoscaling_lb
   autoscaling_scale_in_control = var.autoscaling_scale_in_control
 
-  update_policy     = [
-    {
-      max_surge_fixed              = 4
-      max_surge_percent            = null
-      instance_redistribution_type = "NONE"
-      max_unavailable_fixed        = 4
-      max_unavailable_percent      = null
-      min_ready_sec                = 180
-      minimal_action               = "RESTART"
-      type                         = "OPPORTUNISTIC"
-      replacement_method           = "SUBSTITUTE"
-    }
-  ]
+  update_policy     = var.update_policy
 }
 
 module "ilbs" {

@@ -43,7 +43,8 @@ module "linux_gateway" {
 resource "google_compute_firewall" "tgw_internet" {
 
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name      = "${var.prefix}-fw-glb-${var.mode}-tgw-internet"
+  name      = "${var.prefix}-fw-glb-${var.mode}-tgw-internal-internet"
+  description = "Transit Gateway to internet firewall"
   project   = var.project_id
   network   = var.network_name
   priority  = 100
@@ -59,14 +60,13 @@ resource "google_compute_firewall" "tgw_internet" {
   target_service_accounts = var.mode == "squid" ? module.squid_gateway.0.proxy_service_accounts : module.linux_gateway.0.proxy_service_accounts
 }
 resource "google_compute_route" "tgw_internet" {
-  count = var.mode == "squid" ? 1 : 0
 
   project          = var.project_id
   network          = var.network_name
   priority         = 100
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name             = "${var.prefix}-rt-glb-${var.mode}-tgw-internet"
-  description      = "Transitivity route for range internet"
+  name             = "${var.prefix}-rt-glb-${var.mode}-tgw-internal-internet"
+  description      = "Transit Gateway to internet route"
   tags             = local.network_egress_internet_tags
   dest_range       = "0.0.0.0/0"
   next_hop_gateway = "default-internet-gateway"
@@ -76,25 +76,24 @@ resource "google_compute_route" "tgw_internet" {
  *****************************************/
 
 resource "google_compute_route" "tgw_routes_trusted" {
-  for_each = var.mode == "squid" ? toset(var.internal_trusted_cidr_ranges) : toset([])
+  for_each = toset(var.internal_trusted_cidr_ranges)
 
   project      = var.project_id
   network      = var.network_name
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name         = "${var.prefix}-rt-glb-${var.mode}-tgw-${replace(replace(each.value, "/", "-"), ".", "-")}"
+  name         = "${var.prefix}-rt-glb-${var.mode}-tgw-proxy-${replace(replace(each.value, "/", "-"), ".", "-")}"
   description  = "Transitivity route for range ${each.value}"
   dest_range   = each.value
   next_hop_ilb = var.mode == "squid" ? module.squid_gateway.0.ilb_id : module.linux_gateway.0.ilb_id
 }
 
 resource "google_compute_route" "tgw_route_internet" {
-  count = var.mode == "squid" ? 1 : 0
 
   project      = var.project_id
   network      = var.network_name
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name         = "${var.prefix}-rt-glb-${var.mode}-tgw-internet"
-  description  = "Transitivity route for range internet"
+  name         = "${var.prefix}-rt-glb-${var.mode}-tgw-proxy-internet"
+  description  = "Transitivity route for internet"
   dest_range   = "0.0.0.0/0"
   next_hop_ilb = var.mode == "squid" ? module.squid_gateway.0.ilb_id : module.linux_gateway.0.ilb_id
 }

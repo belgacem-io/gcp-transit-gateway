@@ -9,7 +9,7 @@ module "instance_template" {
   source  = "terraform-google-modules/vm/google//modules/instance_template"
   version = "~> 7.9"
 
-  name_prefix     = var.prefix
+  name_prefix     = "${var.prefix}-tpl-bastion"
   project_id      = var.project_id
   machine_type    = var.instance_type
   subnetwork      = var.subnet_self_link

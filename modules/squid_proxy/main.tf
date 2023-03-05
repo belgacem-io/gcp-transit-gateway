@@ -18,7 +18,7 @@ module "proxy_template" {
   region             = var.default_region
   can_ip_forward     = true
   disk_size_gb       = 10
-  name_prefix        = var.prefix
+  name_prefix        = "${var.prefix}-tpl-squid"
   network            = var.vpc_name
   subnetwork         = var.subnet_name
   subnetwork_project = var.project_id
