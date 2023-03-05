@@ -77,6 +77,7 @@
 | <a name="input_nat_enabled"></a> [nat\_enabled](#input\_nat\_enabled) | Toggle creation of NAT cloud router. | `bool` | `false` | no |
 | <a name="input_nat_num_addresses"></a> [nat\_num\_addresses](#input\_nat\_num\_addresses) | Number of external IPs to reserve for Cloud NAT. | `number` | `2` | no |
 | <a name="input_nat_num_addresses_region1"></a> [nat\_num\_addresses\_region1](#input\_nat\_num\_addresses\_region1) | Number of external IPs to reserve for first Cloud NAT. | `number` | `2` | no |
+| <a name="input_net_tag_internet_egress"></a> [net\_tag\_internet\_egress](#input\_net\_tag\_internet\_egress) | Network tags for VMs with internet access. | `string` | `"restricted-egress-internet"` | no |
 | <a name="input_optional_fw_rules_enabled"></a> [optional\_fw\_rules\_enabled](#input\_optional\_fw\_rules\_enabled) | Toggle creation of optional firewall rules: IAP SSH, IAP RDP and Internal & Global load balancing health check and load balancing IP ranges. | `bool` | `false` | no |
 | <a name="input_org_nethub_project_id"></a> [org\_nethub\_project\_id](#input\_org\_nethub\_project\_id) | Organization hub network project. Required en spoke mode | `string` | `null` | no |
 | <a name="input_org_nethub_vpc_self_link"></a> [org\_nethub\_vpc\_self\_link](#input\_org\_nethub\_vpc\_self\_link) | Organization hub network VPC self link. Required en spoke mode | `string` | `null` | no |
@@ -88,14 +89,13 @@
 | <a name="input_secondary_ranges"></a> [secondary\_ranges](#input\_secondary\_ranges) | Secondary ranges that will be used in some of the subnets | <pre>map(list(object({<br>    range_name    = string,<br>    ip_cidr_range = string<br>  })))</pre> | `{}` | no |
 | <a name="input_shared_vpc_host"></a> [shared\_vpc\_host](#input\_shared\_vpc\_host) | If the Network will be shared with others projects | `bool` | `true` | no |
 | <a name="input_subnetworks_enable_logging"></a> [subnetworks\_enable\_logging](#input\_subnetworks\_enable\_logging) | Toggle subnetworks flow logging for VPC Subnetworks. | `bool` | `false` | no |
-| <a name="input_tgw_internet_egress_tag"></a> [tgw\_internet\_egress\_tag](#input\_tgw\_internet\_egress\_tag) | Network tags for VMs with internet access. | `string` | `"tgw-egress-internet"` | no |
 | <a name="input_windows_activation_enabled"></a> [windows\_activation\_enabled](#input\_windows\_activation\_enabled) | Enable Windows license activation for Windows workloads. | `bool` | `false` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_network_internet_egress_tag"></a> [network\_internet\_egress\_tag](#output\_network\_internet\_egress\_tag) | Network tags for VMs with internet access. |
+| <a name="output_net_tag_internet_egress"></a> [net\_tag\_internet\_egress](#output\_net\_tag\_internet\_egress) | Network tags for VMs with internet access. |
 | <a name="output_network_name"></a> [network\_name](#output\_network\_name) | The name of the VPC being created |
 | <a name="output_network_self_link"></a> [network\_self\_link](#output\_network\_self\_link) | The URI of the VPC being created |
 | <a name="output_subnets_ids"></a> [subnets\_ids](#output\_subnets\_ids) | The IDs of the subnets being created |
