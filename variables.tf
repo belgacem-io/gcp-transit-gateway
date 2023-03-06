@@ -26,15 +26,6 @@ variable "hub_private_subnets" {
   default     = []
 }
 
-variable "hub_private_svc_connect_subnets" {
-  type = list(object({
-    subnet_name  = string
-    subnet_ip    = string
-  }))
-  description = "The list of subnets to publish a managed service by using Private Service Connect."
-  default     = []
-}
-
 variable "spoke1_private_subnets" {
   type = list(object({
     subnet_name  = string

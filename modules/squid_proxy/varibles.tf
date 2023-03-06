@@ -114,14 +114,22 @@ variable "network_tags" {
   default = []
 }
 
-variable "authorized_ports" {
+variable "safe_ports" {
   type        = list(string)
   description = "List of safe ports."
   default     = [
     "80", # http
+    "8080", # http
+    "21" # ftp
+  ]
+}
+
+variable "ssl_ports" {
+  type        = list(string)
+  description = "List of SSL ports."
+  default     = [
     "443", # https
-    "21", # ftp
-    "3128" # Default proxy port
+    "8443" # https
   ]
 }
 

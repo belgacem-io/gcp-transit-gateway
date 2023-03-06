@@ -113,17 +113,6 @@ variable "network_tags" {
   default = []
 }
 
-variable "authorized_ports" {
-  type        = list(string)
-  description = "List of safe ports."
-  default     = [
-    "80", # http
-    "443", # https
-    "21", # ftp
-    "3128" # Default proxy port
-  ]
-}
-
 variable "update_policy" {
   type = list(object({
     max_surge_fixed              = number

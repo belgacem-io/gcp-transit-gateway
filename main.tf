@@ -17,7 +17,6 @@ module "nethub" {
   nat_enabled                   = true
   public_subnets                = var.hub_public_subnets
   private_subnets               = var.hub_private_subnets
-  private_svc_connect_subnets   = var.hub_private_svc_connect_subnets
   allow_all_egress_ranges       = ["0.0.0.0/0"]
   allow_all_ingress_ranges      = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]

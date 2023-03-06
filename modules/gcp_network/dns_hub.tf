@@ -36,3 +36,20 @@ module "dns-forwarding-zone" {
   ]
   target_name_server_addresses = var.dns_outbound_server_addresses
 }
+
+/******************************************
+  Private Google APIs DNS Zone & records.
+ *****************************************/
+module "private_service_connect" {
+  source  = "terraform-google-modules/network/google//modules/private-service-connect"
+  version = "~> 5.2"
+
+  count = var.mode == "hub" && var.private_svc_connect_ip !=null ? 1 : 0
+
+  forwarding_rule_name         = "privategoogleapi"
+  private_service_connect_name = "${var.environment_code}-gip-psconnect"
+  project_id                   = var.project_id
+  network_self_link            = module.main.network_self_link
+  private_service_connect_ip   = var.private_svc_connect_ip
+  forwarding_rule_target       = "all-apis"
+}

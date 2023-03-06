@@ -28,13 +28,10 @@ module "proxy_template" {
     scopes = ["cloud-platform"]
   }
   metadata = {
-    squid-conf = templatefile("${path.module}/files/squid.conf", {
+    user-data = templatefile("${path.module}/files/squid.yaml", {
       trusted_cidr_ranges = var.source_trusted_cidr_ranges
-      safe_ports          = var.authorized_ports
-    })
-    startup-script = templatefile("${path.module}/files/startup.sh", {
-      trusted_cidr_ranges = var.source_trusted_cidr_ranges
-      safe_ports          = var.authorized_ports
+      safe_ports          = var.safe_ports
+      ssl_ports           = var.ssl_ports
     })
   }
   source_image_family  = split("/", var.instance_image)[1]
@@ -67,10 +64,6 @@ module "proxy_migs" {
   autoscaling_metric           = var.autoscaling_metric
   autoscaling_lb               = var.autoscaling_lb
   autoscaling_scale_in_control = var.autoscaling_scale_in_control
-
-  depends_on = [
-    module.proxy_template
-  ]
 }
 
 module "proxy_ilbs" {
@@ -108,7 +101,4 @@ module "proxy_ilbs" {
     host                = null
     enable_log          = false
   }
-  depends_on = [
-    module.proxy_migs
-  ]
 }

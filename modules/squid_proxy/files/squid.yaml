@@ -1,0 +1,60 @@
+#cloud-config
+write_files:
+  - path: /etc/sysctl.conf
+    permissions: "0644"
+    owner: root
+    content: |
+      net.ipv4.ip_forward = 1
+      net.ipv6.conf.all.forwarding = 1
+      net.ipv4.conf.all.accept_redirects = 0
+      net.ipv4.conf.all.send_redirects = 0
+  - path: /tmp/squid.conf
+    permissions: "0644"
+    owner: root
+    content: |
+      # Local network access to proxy
+%{ for addr in trusted_cidr_ranges ~}
+      acl localnet src  ${addr}
+%{ endfor ~}
+      http_access allow localnet
+      # Safe ports that can be used
+      acl Safe_ports port  1025-65535 # unregistered ports
+      acl Safe_ports port  3128 # Default port
+%{ for port in concat(safe_ports,ssl_ports) ~}
+      acl Safe_ports port ${port}
+%{ endfor ~}
+%{ for port in ssl_ports ~}
+      acl SSL_ports port ${port}
+%{ endfor ~}
+      acl localnet src fc00::/7       # RFC 4193 local private network range
+      acl localnet src fe80::/10      # RFC 4291 link-local (directly plugged) machinesacl SSL_ports port 443
+      acl CONNECT method CONNECT
+      # Deny requests to unsafe ports
+      http_access deny !Safe_ports
+      # Deny CONNECT to non-ssl ports
+      http_access deny CONNECT !SSL_ports
+      # Only allow cachemgr access from localhost
+      http_access allow localhost manager
+      http_access deny manager
+      http_access allow localhost
+      # And finally deny all other access to this proxy
+      http_access deny all
+      # Squid normally listens to port 3128
+      http_port 3128 intercept
+      # Leave coredumps in the first cache dir
+      coredump_dir /var/spool/squid
+runcmd:
+  # Install squid
+  - apt-get update
+  - apt-get -y install squid
+  - systemctl enable squid
+  - mv /etc/squid/squid.conf /etc/squid/squid.conf.old
+  - cp /tmp/squid.conf /etc/squid/squid.conf
+  # Update sysctl config
+  - sysctl -p
+  # Route inbound traffic into squid
+%{ for port in concat(safe_ports,ssl_ports) ~}
+  - iptables -t nat -I PREROUTING 1 -s ${join(",", trusted_cidr_ranges)} -p tcp --dport ${port} -j REDIRECT --to-port 3128
+%{ endfor ~}
+  - systemctl restart squid
+  - ufw allow 3128/tcp
