@@ -3,6 +3,28 @@ locals {
   prefix           = "${var.project_id}-${local.environment_code}"
 }
 
+# Creates a private key in PEM format
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+}
+
+# Generates a TLS self-signed certificate using the private key
+resource "tls_self_signed_cert" "self_signed_cert" {
+  private_key_pem       = tls_private_key.private_key.private_key_pem
+  validity_period_hours = 48
+
+  subject {
+    # The subject CN field here contains the hostname to secure
+    common_name = "transit-gateway"
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth"
+  ]
+}
+
 module "nethub" {
   source = "./modules/gcp_network"
 
@@ -20,6 +42,10 @@ module "nethub" {
   allow_all_egress_ranges       = ["0.0.0.0/0"]
   allow_all_ingress_ranges      = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  org_private_ca                = {
+    cert = tls_self_signed_cert.self_signed_cert.cert_pem
+    key  = tls_private_key.private_key.private_key_pem
+  }
 }
 
 module "nethub_bastion" {

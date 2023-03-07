@@ -18,6 +18,7 @@ module "squid_gateway" {
   subnetwork_name                 = var.subnetwork_name
   network_name                    = var.network_name
   network_tags                    = local.network_egress_internet_tags
+  private_ca                      = var.org_private_ca
 }
 
 /******************************************

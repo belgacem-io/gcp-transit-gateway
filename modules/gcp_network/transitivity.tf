@@ -13,6 +13,7 @@ module "transitivity_gateway" {
   internal_trusted_cidr_ranges = var.internal_trusted_cidr_ranges
   subnetwork_name              = local.private_subnets[0].subnet_name
   network_name                 = module.main.network_name
+  org_private_ca               = var.org_private_ca
 
   depends_on = [
     module.main

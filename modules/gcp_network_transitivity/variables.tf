@@ -37,3 +37,12 @@ variable "internal_trusted_cidr_ranges" {
   description = "Internal trusted ip ranges. Must be set to private ip ranges"
   type        = list(string)
 }
+
+variable "org_private_ca" {
+  type        = object({
+    cert = string
+    key  = string
+  })
+  default     = null
+  description = "The Organization CertificateAuthority's certificate. Required in squid mode"
+}

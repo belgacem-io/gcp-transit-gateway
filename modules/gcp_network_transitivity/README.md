@@ -63,6 +63,7 @@
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID for Private Shared VPC. | `string` | n/a | yes |
 | <a name="input_subnetwork_name"></a> [subnetwork\_name](#input\_subnetwork\_name) | The subnetwork name. | `string` | n/a | yes |
 | <a name="input_mode"></a> [mode](#input\_mode) | Network deployment mode, should be set to `squid` or `linux`. | `string` | `null` | no |
+| <a name="input_org_private_ca"></a> [org\_private\_ca](#input\_org\_private\_ca) | The Organization CertificateAuthority's certificate. Required in squid mode | <pre>object({<br>    cert = string<br>    key  = string<br>  })</pre> | `null` | no |
 
 ## Outputs
 

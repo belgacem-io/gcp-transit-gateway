@@ -47,7 +47,7 @@ variable "instance_type" {
 variable "instance_image" {
   description = "The instance image. Must be debian base."
   type        = string
-  default     = "ubuntu-os-cloud/ubuntu-minimal-1804-lts"
+  default     = "ubuntu-os-cloud/ubuntu-minimal-2004-lts"
 }
 
 
@@ -120,6 +120,7 @@ variable "safe_ports" {
   default     = [
     "80", # http
     "8080", # http
+    "1080", # http
     "21" # ftp
   ]
 }
@@ -170,4 +171,12 @@ variable "authorized_members" {
   description = "List of members in the standard GCP form: user:{email}, serviceAccount:{email}, group:{email}"
   type        = list(string)
   default = []
+}
+
+variable "private_ca" {
+  type        = object({
+    cert = string
+    key  = string
+  })
+  description = "The Organization CertificateAuthority's certificate."
 }

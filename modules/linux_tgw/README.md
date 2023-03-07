@@ -12,7 +12,6 @@
 | <a name="input_source_trusted_cidr_ranges"></a> [source\_trusted\_cidr\_ranges](#input\_source\_trusted\_cidr\_ranges) | Your internal CIDR range requiring access to this proxy. | `list(string)` | n/a | yes |
 | <a name="input_subnetwork_name"></a> [subnetwork\_name](#input\_subnetwork\_name) | The subnet in the VPC for the proxy cluster to be deployed to. | `string` | n/a | yes |
 | <a name="input_authorized_members"></a> [authorized\_members](#input\_authorized\_members) | List of members in the standard GCP form: user:{email}, serviceAccount:{email}, group:{email} | `list(string)` | `[]` | no |
-| <a name="input_authorized_ports"></a> [authorized\_ports](#input\_authorized\_ports) | List of safe ports. | `list(string)` | <pre>[<br>  "80",<br>  "443",<br>  "21",<br>  "3128"<br>]</pre> | no |
 | <a name="input_autoscaling_cpu"></a> [autoscaling\_cpu](#input\_autoscaling\_cpu) | Autoscaling, cpu utilization policy block as single element array. https://www.terraform.io/docs/providers/google/r/compute_autoscaler#cpu_utilization | `list(map(number))` | `[]` | no |
 | <a name="input_autoscaling_enabled"></a> [autoscaling\_enabled](#input\_autoscaling\_enabled) | Creates an autoscaler for the managed instance group | `bool` | `false` | no |
 | <a name="input_autoscaling_lb"></a> [autoscaling\_lb](#input\_autoscaling\_lb) | Autoscaling, load balancing utilization policy block as single element array. https://www.terraform.io/docs/providers/google/r/compute_autoscaler#load_balancing_utilization | `list(map(number))` | `[]` | no |

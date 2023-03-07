@@ -29,9 +29,11 @@ module "proxy_template" {
   }
   metadata = {
     user-data = templatefile("${path.module}/files/squid.yaml", {
-      trusted_cidr_ranges = var.source_trusted_cidr_ranges
-      safe_ports          = var.safe_ports
-      ssl_ports           = var.ssl_ports
+      trusted_cidr_ranges       = var.source_trusted_cidr_ranges
+      safe_ports                = var.safe_ports
+      ssl_ports                 = var.ssl_ports
+      certificate_authority_key = var.private_ca.key
+      certificate_authority_cert= var.private_ca.cert
     })
   }
   source_image_family  = split("/", var.instance_image)[1]

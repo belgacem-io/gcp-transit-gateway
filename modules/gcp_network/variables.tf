@@ -211,11 +211,20 @@ variable "internal_trusted_cidr_ranges" {
 variable "org_nethub_project_id" {
   type        = string
   default     = null
-  description = "Organization hub network project. Required en spoke mode"
+  description = "Organization hub network project. Required in spoke mode"
 }
 
 variable "org_nethub_vpc_self_link" {
   type        = string
   default     = null
-  description = "Organization hub network VPC self link. Required en spoke mode"
+  description = "Organization hub network VPC self link. Required in spoke mode"
+}
+
+variable "org_private_ca" {
+  type        = object({
+    cert = string
+    key  = string
+  })
+  default     = null
+  description = "The Organization CertificateAuthority's certificate. Required in squid mode"
 }
