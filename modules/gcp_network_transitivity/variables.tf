@@ -17,12 +17,6 @@ variable "subnetwork_name" {
   description = "The subnetwork name."
 }
 
-variable "mode" {
-  type        = string
-  description = "Network deployment mode, should be set to `squid` or `linux`."
-  default     = null
-}
-
 variable "environment_code" {
   type        = string
   description = "A short form of the folder level resources (environment) within the Google Cloud organization."
@@ -36,6 +30,16 @@ variable "default_region" {
 variable "internal_trusted_cidr_ranges" {
   description = "Internal trusted ip ranges. Must be set to private ip ranges"
   type        = list(string)
+}
+
+variable "enable_inter_vpc_gateway" {
+  description = "If enabled, an internal transit gateway will be created and traffic can flow between VPCs"
+  type        = bool
+}
+
+variable "enable_internet_gateway" {
+  description = "If enabled, a transparent gateway will be created and traffic can flow from VPCs to internet."
+  type        = bool
 }
 
 variable "org_private_ca" {

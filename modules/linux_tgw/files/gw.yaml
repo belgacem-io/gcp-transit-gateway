@@ -8,20 +8,19 @@ write_files:
       net.ipv6.conf.all.forwarding = 1
       net.ipv4.conf.all.accept_redirects = 0
       net.ipv4.conf.all.send_redirects = 0
+      net.ipv4.conf.all.proxy_arp = 1
 runcmd:
   - sysctl -p
   # Accept all ICMP (troubleshooting)
   - iptables -A INPUT -p icmp -j ACCEPT
   # Accept SSH local traffic to the eth0 interface (health checking)
-  - iptables -A INPUT -p tcp --dport 22 -d $(hostname -I | awk '{print $1}') -j ACCEPT
+  #- iptables -A INPUT -p tcp --dport 22 -d $(hostname -I | awk '{print $1}') -j ACCEPT
   # Drop everything else
-  - iptables -A INPUT -j DROP
+  #- iptables -A INPUT -j DROP
   # Accept all return transit traffic for established flows
   - iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
   # Accept all transit traffic from internal ranges
   # Replace by actual multiple source/destination/proto/ports rules for fine-grained ACLs.
-  - iptables -A FORWARD -s ${source_trusted_ip_ranges} -d ${destination_trusted_ip_ranges} -j ACCEPT
+  - iptables -A FORWARD -s 0.0.0.0/0 -d 0.0.0.0/0 -j ACCEPT
   # Drop everything else
   - iptables -A FORWARD -j DROP
-  # SNAT traffic not to the local eth0 interface
-  - iptables -t nat -A POSTROUTING ! -d $(hostname -I | awk '{print $1}') -j MASQUERADE

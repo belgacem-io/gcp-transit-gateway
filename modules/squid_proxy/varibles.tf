@@ -33,11 +33,6 @@ variable "source_trusted_cidr_ranges" {
   type        = list(string)
 }
 
-variable "destination_trusted_cidr_ranges" {
-  description = "Your internal/external CIDR range requiring access from this proxy."
-  type        = list(string)
-}
-
 variable "instance_type" {
   description = "The instance type"
   type        = string
@@ -111,7 +106,7 @@ variable "autoscaling_enabled" {
 variable "network_tags" {
   type        = list(string)
   description = "Network tags for VMs."
-  default = []
+  default = ["squid-gateway"]
 }
 
 variable "safe_ports" {

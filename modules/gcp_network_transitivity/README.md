@@ -56,13 +56,14 @@
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_default_region"></a> [default\_region](#input\_default\_region) | Default region 1 for subnets and Cloud Routers | `string` | n/a | yes |
+| <a name="input_enable_inter_vpc_gateway"></a> [enable\_inter\_vpc\_gateway](#input\_enable\_inter\_vpc\_gateway) | If enabled, an internal transit gateway will be created and traffic can flow between VPCs | `bool` | n/a | yes |
+| <a name="input_enable_internet_gateway"></a> [enable\_internet\_gateway](#input\_enable\_internet\_gateway) | If enabled, a transparent gateway will be created and traffic can flow from VPCs to internet. | `bool` | n/a | yes |
 | <a name="input_environment_code"></a> [environment\_code](#input\_environment\_code) | A short form of the folder level resources (environment) within the Google Cloud organization. | `string` | n/a | yes |
 | <a name="input_internal_trusted_cidr_ranges"></a> [internal\_trusted\_cidr\_ranges](#input\_internal\_trusted\_cidr\_ranges) | Internal trusted ip ranges. Must be set to private ip ranges | `list(string)` | n/a | yes |
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | The network name. | `string` | n/a | yes |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix applied to service to all resources. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID for Private Shared VPC. | `string` | n/a | yes |
 | <a name="input_subnetwork_name"></a> [subnetwork\_name](#input\_subnetwork\_name) | The subnetwork name. | `string` | n/a | yes |
-| <a name="input_mode"></a> [mode](#input\_mode) | Network deployment mode, should be set to `squid` or `linux`. | `string` | `null` | no |
 | <a name="input_org_private_ca"></a> [org\_private\_ca](#input\_org\_private\_ca) | The Organization CertificateAuthority's certificate. Required in squid mode | <pre>object({<br>    cert = string<br>    key  = string<br>  })</pre> | `null` | no |
 
 ## Outputs

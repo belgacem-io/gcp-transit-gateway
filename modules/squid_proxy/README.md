@@ -4,7 +4,6 @@
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_default_region"></a> [default\_region](#input\_default\_region) | Default region 1 for subnets and Cloud Routers | `string` | n/a | yes |
-| <a name="input_destination_trusted_cidr_ranges"></a> [destination\_trusted\_cidr\_ranges](#input\_destination\_trusted\_cidr\_ranges) | Your internal/external CIDR range requiring access from this proxy. | `list(string)` | n/a | yes |
 | <a name="input_environment_code"></a> [environment\_code](#input\_environment\_code) | The environment the single project belongs to | `string` | n/a | yes |
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | The GCP VPC network name for the cluster to be built in. | `string` | n/a | yes |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix applied to service to all resources. | `string` | n/a | yes |
@@ -24,7 +23,7 @@
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | The instance type | `string` | `"e2-micro"` | no |
 | <a name="input_max_replicas"></a> [max\_replicas](#input\_max\_replicas) | The maximum number of instances that the autoscaler can scale up to. This is required when creating or updating an autoscaler. The maximum number of replicas should not be lower than minimal number of replicas. | `number` | `1` | no |
 | <a name="input_min_replicas"></a> [min\_replicas](#input\_min\_replicas) | The minimum number of replicas that the autoscaler can scale down to. This cannot be less than 0. | `number` | `1` | no |
-| <a name="input_network_tags"></a> [network\_tags](#input\_network\_tags) | Network tags for VMs. | `list(string)` | `[]` | no |
+| <a name="input_network_tags"></a> [network\_tags](#input\_network\_tags) | Network tags for VMs. | `list(string)` | <pre>[<br>  "squid-gateway"<br>]</pre> | no |
 | <a name="input_safe_ports"></a> [safe\_ports](#input\_safe\_ports) | List of safe ports. | `list(string)` | <pre>[<br>  "80",<br>  "8080",<br>  "1080",<br>  "21"<br>]</pre> | no |
 | <a name="input_ssl_ports"></a> [ssl\_ports](#input\_ssl\_ports) | List of SSL ports. | `list(string)` | <pre>[<br>  "443",<br>  "8443"<br>]</pre> | no |
 | <a name="input_update_policy"></a> [update\_policy](#input\_update\_policy) | The rolling update policy. https://www.terraform.io/docs/providers/google/r/compute_region_instance_group_manager#rolling_update_policy | <pre>list(object({<br>    max_surge_fixed              = number<br>    instance_redistribution_type = string<br>    max_surge_percent            = number<br>    max_unavailable_fixed        = number<br>    max_unavailable_percent      = number<br>    min_ready_sec                = number<br>    replacement_method           = string<br>    minimal_action               = string<br>    type                         = string<br>  }))</pre> | <pre>[<br>  {<br>    "instance_redistribution_type": "NONE",<br>    "max_surge_fixed": 0,<br>    "max_surge_percent": null,<br>    "max_unavailable_fixed": 4,<br>    "max_unavailable_percent": null,<br>    "min_ready_sec": 180,<br>    "minimal_action": "RESTART",<br>    "replacement_method": "RECREATE",<br>    "type": "OPPORTUNISTIC"<br>  }<br>]</pre> | no |

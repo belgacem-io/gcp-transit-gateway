@@ -1,6 +1,6 @@
 locals {
   environment_code = "demo"
-  prefix           = "${var.project_id}-${local.environment_code}"
+  prefix           = "hbe-${local.environment_code}"
 }
 
 # Creates a private key in PEM format
@@ -39,8 +39,8 @@ module "nethub" {
   nat_enabled                   = true
   public_subnets                = var.hub_public_subnets
   private_subnets               = var.hub_private_subnets
-  allow_all_egress_ranges       = ["0.0.0.0/0"]
-  allow_all_ingress_ranges      = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  allow_egress_ranges           = ["0.0.0.0/0"]
+  allow_ingress_ranges          = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   org_private_ca                = {
     cert = tls_self_signed_cert.self_signed_cert.cert_pem
@@ -50,7 +50,7 @@ module "nethub" {
 
 module "nethub_bastion" {
   source                      = "./modules/gcp_bastion_host"
-  prefix                      = local.prefix
+  prefix                      = "${local.prefix}-hub"
   environment_code            = local.environment_code
   authorized_members          = []
   instance_name               = "hub-bastion"
@@ -67,7 +67,7 @@ module "nethub_bastion" {
 
 module "netspoke1" {
   source                        = "./modules/gcp_network"
-  prefix                        = "${local.prefix}1"
+  prefix                        = "${local.prefix}-spoke1"
   environment_code              = local.environment_code
   mode                          = "spoke"
   network_name                  = "spoke1"
@@ -78,8 +78,8 @@ module "netspoke1" {
   org_nethub_project_id         = var.project_id
   org_nethub_vpc_self_link      = module.nethub.network_self_link
   private_subnets               = var.spoke1_private_subnets
-  allow_all_egress_ranges       = ["0.0.0.0/0"]
-  allow_all_ingress_ranges      = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  allow_egress_ranges           = ["0.0.0.0/0"]
+  allow_ingress_ranges          = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
 
   depends_on = [
@@ -89,7 +89,7 @@ module "netspoke1" {
 
 module "netspoke1_bastion" {
   source                      = "./modules/gcp_bastion_host"
-  prefix                      = "${local.prefix}1"
+  prefix                      = "${local.prefix}-spoke1"
   environment_code            = local.environment_code
   authorized_members          = []
   instance_name               = "spoke1-bastion"
@@ -106,7 +106,7 @@ module "netspoke1_bastion" {
 
 module "netspoke2" {
   source                        = "./modules/gcp_network"
-  prefix                        = "${local.prefix}2"
+  prefix                        = "${local.prefix}-spoke2"
   environment_code              = local.environment_code
   mode                          = "spoke"
   network_name                  = "spoke2"
@@ -117,8 +117,8 @@ module "netspoke2" {
   org_nethub_project_id         = var.project_id
   org_nethub_vpc_self_link      = module.nethub.network_self_link
   private_subnets               = var.spoke2_private_subnets
-  allow_all_egress_ranges       = ["0.0.0.0/0"]
-  allow_all_ingress_ranges      = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  allow_egress_ranges           = ["0.0.0.0/0"]
+  allow_ingress_ranges          = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
 
   depends_on = [
@@ -128,7 +128,7 @@ module "netspoke2" {
 
 module "netspoke2_bastion" {
   source                      = "./modules/gcp_bastion_host"
-  prefix                      = "${local.prefix}2"
+  prefix                      = "${local.prefix}spoke2"
   environment_code            = local.environment_code
   authorized_members          = []
   instance_name               = "spoke2-bastion"

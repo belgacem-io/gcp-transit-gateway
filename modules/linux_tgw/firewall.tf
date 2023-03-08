@@ -1,9 +1,9 @@
 /******************************************
   Mandatory firewall rules
  *****************************************/
-resource "google_compute_firewall" "allow_ingress" {
+resource "google_compute_firewall" "allow_trusted_vpc_to_tgw" {
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name      = "${var.prefix}-fw-glb-allow-linuxtgwt-ingress"
+  name      = "${var.prefix}-fw-glb-allow-trusted-vpc-to-tgw"
   network   = var.network_name
   project   = var.project_id
   direction = "INGRESS"
@@ -29,9 +29,9 @@ resource "google_compute_firewall" "allow_ingress" {
   target_service_accounts = module.service_account.emails_list
 }
 
-resource "google_compute_firewall" "allow_egress" {
+resource "google_compute_firewall" "allow_tgw_to_trusted_vpc" {
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name      = "${var.prefix}-fw-glb-allow-linuxtgwt-egress"
+  name      = "${var.prefix}-fw-glb-allow-tgw-to-trusted-vpc"
   network   = var.network_name
   project   = var.project_id
   direction = "EGRESS"
@@ -57,6 +57,10 @@ resource "google_compute_firewall" "allow_egress" {
   target_service_accounts = module.service_account.emails_list
 }
 
+/******************************************
+  IAP Configuration
+ *****************************************/
+
 resource "google_project_iam_member" "os_login_bindings" {
   for_each = toset(var.authorized_members)
   project  = var.project_id
@@ -69,7 +73,7 @@ module "iap_tunneling" {
   version = "~> 5.1"
 
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  fw_name_allow_ssh_from_iap = "${var.prefix}-iap-glb-allow-iap-to-tunnel"
+  fw_name_allow_ssh_from_iap = "${var.prefix}-iap-glb-allow-tgw-ipa"
   project                    = var.project_id
   network                    = var.network_name
   service_accounts           = module.service_account.emails_list

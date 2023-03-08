@@ -153,13 +153,13 @@ variable "optional_fw_rules_enabled" {
   default     = false
 }
 
-variable "allow_all_egress_ranges" {
+variable "allow_egress_ranges" {
   type        = list(string)
   description = "List of network ranges to which all egress traffic will be allowed"
   default     = null
 }
 
-variable "allow_all_ingress_ranges" {
+variable "allow_ingress_ranges" {
   type        = list(string)
   description = "List of network ranges from which all ingress traffic will be allowed"
   default     = null

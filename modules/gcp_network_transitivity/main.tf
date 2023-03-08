@@ -1,102 +1,63 @@
-locals {
-  network_egress_internet_tags = ["tgw-egress-internet"]
-}
 /******************************************
-  Squid Proxy.
+  Internet Transit Gateway Proxy.
  *****************************************/
-module "squid_gateway" {
+module "transparent_squid" {
   source = "../squid_proxy"
 
-  count = var.mode == "squid" ? 1 : 0
+  count = var.enable_internet_gateway ? 1 : 0
 
   environment_code                = var.environment_code
   project_id                      = var.project_id
   default_region                  = var.default_region
   prefix                          = var.prefix
   source_trusted_cidr_ranges      = var.internal_trusted_cidr_ranges
-  destination_trusted_cidr_ranges = ["0.0.0.0/0"]
   subnetwork_name                 = var.subnetwork_name
   network_name                    = var.network_name
-  network_tags                    = local.network_egress_internet_tags
   private_ca                      = var.org_private_ca
 }
 
 /******************************************
-  Linux Gateway.
+  VPC Transit Gateway.
  *****************************************/
-module "linux_gateway" {
+module "vpc_tgw" {
   source = "../linux_tgw"
 
-  count = var.mode == "linux" ? 1 : 0
+  count = var.enable_inter_vpc_gateway ? 1 : 0
 
   environment_code                = var.environment_code
   project_id                      = var.project_id
   default_region                  = var.default_region
   prefix                          = var.prefix
   source_trusted_cidr_ranges      = var.internal_trusted_cidr_ranges
-  destination_trusted_cidr_ranges = ["0.0.0.0/0"]
+  destination_trusted_cidr_ranges = var.internal_trusted_cidr_ranges
   subnetwork_name                 = var.subnetwork_name
   network_name                    = var.network_name
-  network_tags                    = local.network_egress_internet_tags
 }
 
-/******************************************
-  Mandatory firewall Routes
- *****************************************/
-resource "google_compute_firewall" "tgw_internet" {
-
-  #[prefix]-[resource]-[location]-[description]-[suffix]
-  name        = "${var.prefix}-fw-glb-${var.mode}-tgw-internal-internet"
-  description = "Transit Gateway to internet firewall"
-  project     = var.project_id
-  network     = var.network_name
-  priority    = 100
-  direction   = "EGRESS"
-  allow {
-    protocol = "tcp"
-  }
-  allow {
-    protocol = "udp"
-  }
-
-  source_ranges           = ["0.0.0.0/0"]
-  target_service_accounts = var.mode == "squid" ? module.squid_gateway.0.proxy_service_accounts : module.linux_gateway.0.proxy_service_accounts
-}
-resource "google_compute_route" "tgw_internet" {
-
-  project          = var.project_id
-  network          = var.network_name
-  priority         = 100
-  #[prefix]-[resource]-[location]-[description]-[suffix]
-  name             = "${var.prefix}-rt-glb-${var.mode}-tgw-internal-internet"
-  description      = "Transit Gateway to internet route"
-  tags             = local.network_egress_internet_tags
-  dest_range       = "0.0.0.0/0"
-  next_hop_gateway = "default-internet-gateway"
-}
 /******************************************
   Transitivity Routes
  *****************************************/
 
-resource "google_compute_route" "tgw_routes_trusted" {
-  for_each = toset(var.internal_trusted_cidr_ranges)
+resource "google_compute_route" "inter_vpc_routes" {
+  for_each = var.enable_inter_vpc_gateway ? toset(var.internal_trusted_cidr_ranges) : toset([])
 
   project      = var.project_id
   network      = var.network_name
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name         = "${var.prefix}-rt-glb-${var.mode}-tgw-proxy-${replace(replace(each.value, "/", "-"), ".", "-")}"
-  description  = "Transitivity route for range ${each.value}"
+  name         = "${var.prefix}-rt-glb-tgw-for-${replace(replace(each.value, "/", "-"), ".", "-")}"
+  description  = "Inter VPCs route through TGW for range ${each.value}"
   dest_range   = each.value
-  next_hop_ilb = var.mode == "squid" ? module.squid_gateway.0.ilb_id : module.linux_gateway.0.ilb_id
+  next_hop_ilb = module.vpc_tgw.0.ilb_id
 }
 
-resource "google_compute_route" "tgw_route_internet" {
+resource "google_compute_route" "internet_route" {
+  count = var.enable_internet_gateway ? 1 : 0
 
   project      = var.project_id
   network      = var.network_name
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  name         = "${var.prefix}-rt-glb-${var.mode}-tgw-proxy-internet"
-  description  = "Transitivity route for internet"
+  name         = "${var.prefix}-rt-glb-squid-internet"
+  description  = "Internet route through Squid Gateway"
   dest_range   = "0.0.0.0/0"
-  next_hop_ilb = var.mode == "squid" ? module.squid_gateway.0.ilb_id : module.linux_gateway.0.ilb_id
+  next_hop_ilb = module.transparent_squid.0.ilb_id
 }

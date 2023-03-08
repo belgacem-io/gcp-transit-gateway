@@ -61,8 +61,8 @@
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | The network name. | `string` | n/a | yes |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix applied to service to all resources. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID for Private Shared VPC. | `string` | n/a | yes |
-| <a name="input_allow_all_egress_ranges"></a> [allow\_all\_egress\_ranges](#input\_allow\_all\_egress\_ranges) | List of network ranges to which all egress traffic will be allowed | `list(string)` | `null` | no |
-| <a name="input_allow_all_ingress_ranges"></a> [allow\_all\_ingress\_ranges](#input\_allow\_all\_ingress\_ranges) | List of network ranges from which all ingress traffic will be allowed | `list(string)` | `null` | no |
+| <a name="input_allow_egress_ranges"></a> [allow\_egress\_ranges](#input\_allow\_egress\_ranges) | List of network ranges to which all egress traffic will be allowed | `list(string)` | `null` | no |
+| <a name="input_allow_ingress_ranges"></a> [allow\_ingress\_ranges](#input\_allow\_ingress\_ranges) | List of network ranges from which all ingress traffic will be allowed | `list(string)` | `null` | no |
 | <a name="input_bgp_asn_dns"></a> [bgp\_asn\_dns](#input\_bgp\_asn\_dns) | BGP Autonomous System Number (ASN). | `number` | `64667` | no |
 | <a name="input_bgp_asn_subnet"></a> [bgp\_asn\_subnet](#input\_bgp\_asn\_subnet) | BGP ASN for Subnets cloud routers. | `number` | `64514` | no |
 | <a name="input_data_subnets"></a> [data\_subnets](#input\_data\_subnets) | The list of data subnets being created | <pre>list(object({<br>    subnet_name  = string<br>    subnet_ip    = string<br>  }))</pre> | `[]` | no |
