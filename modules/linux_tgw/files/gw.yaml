@@ -21,6 +21,6 @@ runcmd:
   - iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
   # Accept all transit traffic from internal ranges
   # Replace by actual multiple source/destination/proto/ports rules for fine-grained ACLs.
-  - iptables -A FORWARD -s 0.0.0.0/0 -d 0.0.0.0/0 -j ACCEPT
+  - iptables -A FORWARD -s ${source_trusted_ip_ranges} -d ${destination_trusted_ip_ranges} -j ACCEPT
   # Drop everything else
   - iptables -A FORWARD -j DROP
