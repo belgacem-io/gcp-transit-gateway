@@ -1,29 +1,13 @@
 locals {
-  environment_code = "demo"
-  prefix           = "hbe-${local.environment_code}"
+  environment_code  = "demo"
+  prefix            = "hbe-${local.environment_code}"
+  public_domain = "hbe.com"
+  private_domain = "hbe.local"
 }
 
-# Creates a private key in PEM format
-resource "tls_private_key" "private_key" {
-  algorithm = "RSA"
-}
-
-# Generates a TLS self-signed certificate using the private key
-resource "tls_self_signed_cert" "self_signed_cert" {
-  private_key_pem       = tls_private_key.private_key.private_key_pem
-  validity_period_hours = 48
-
-  subject {
-    # The subject CN field here contains the hostname to secure
-    common_name = "transit-gateway"
-  }
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth"
-  ]
-}
+/******************************************
+  Network.
+ *****************************************/
 
 module "nethub" {
   source = "./modules/gcp_network"
@@ -31,7 +15,7 @@ module "nethub" {
   prefix                        = local.prefix
   environment_code              = local.environment_code
   mode                          = "hub"
-  network_name                  = "hub"
+  network_suffix                  = "hub"
   project_id                    = var.project_id
   default_region                = var.default_region
   shared_vpc_host               = false
@@ -42,10 +26,9 @@ module "nethub" {
   allow_egress_ranges           = ["0.0.0.0/0"]
   allow_ingress_ranges          = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
-  org_private_ca                = {
-    cert = tls_self_signed_cert.self_signed_cert.cert_pem
-    key  = tls_private_key.private_key.private_key_pem
-  }
+  private_domain = local.private_domain
+  public_domain = local.public_domain
+
 }
 
 module "nethub_bastion" {
@@ -70,7 +53,7 @@ module "netspoke1" {
   prefix                        = "${local.prefix}-spoke1"
   environment_code              = local.environment_code
   mode                          = "spoke"
-  network_name                  = "spoke1"
+  network_suffix                  = "spoke1"
   project_id                    = var.project_id
   default_region                = var.default_region
   shared_vpc_host               = false
@@ -81,6 +64,8 @@ module "netspoke1" {
   allow_egress_ranges           = ["0.0.0.0/0"]
   allow_ingress_ranges          = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  private_domain = local.private_domain
+  public_domain = local.public_domain
 
   depends_on = [
     module.nethub
@@ -109,7 +94,7 @@ module "netspoke2" {
   prefix                        = "${local.prefix}-spoke2"
   environment_code              = local.environment_code
   mode                          = "spoke"
-  network_name                  = "spoke2"
+  network_suffix                  = "spoke2"
   project_id                    = var.project_id
   default_region                = var.default_region
   shared_vpc_host               = false
@@ -120,6 +105,8 @@ module "netspoke2" {
   allow_egress_ranges           = ["0.0.0.0/0"]
   allow_ingress_ranges          = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   internal_trusted_cidr_ranges  = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  private_domain = local.private_domain
+  public_domain = local.public_domain
 
   depends_on = [
     module.nethub

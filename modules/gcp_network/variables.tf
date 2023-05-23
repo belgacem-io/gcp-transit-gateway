@@ -8,9 +8,9 @@ variable "prefix" {
   description = "Prefix applied to service to all resources."
 }
 
-variable "network_name" {
+variable "network_suffix" {
   type        = string
-  description = "The network name."
+  description = "The network suffix, will be used for generating the final name."
 }
 
 variable "mode" {
@@ -123,10 +123,14 @@ variable "firewall_enable_logging" {
   default     = false
 }
 
-variable "domain" {
+variable "public_domain" {
   type        = string
   description = "The DNS name of peering managed zone, for instance 'example.com.'. Require when dns_enable_outbound_forwarding=true"
-  default = ""
+}
+
+variable "private_domain" {
+  type        = string
+  description = "The DNS name of the local  managed zone, for instance 'example.local.'."
 }
 
 variable "private_service_cidr" {
@@ -185,6 +189,7 @@ variable "dns_outbound_server_addresses" {
   }))
   default = null
 }
+
 variable "subnetworks_enable_logging" {
   type        = bool
   description = "Toggle subnetworks flow logging for VPC Subnetworks."
@@ -204,27 +209,24 @@ variable "bgp_asn_subnet" {
 }
 
 variable "internal_trusted_cidr_ranges" {
-  description = "Internal trusted ip ranges. Must be set to private ip ranges"
+  description = "Internal trusted ip ranges. Must be set to private ip ranges."
   type        = list(string)
 }
 
 variable "org_nethub_project_id" {
   type        = string
   default     = null
-  description = "Organization hub network project. Required in spoke mode"
+  description = "Organization hub network project. Required in spoke mode."
 }
 
 variable "org_nethub_vpc_self_link" {
   type        = string
   default     = null
-  description = "Organization hub network VPC self link. Required in spoke mode"
+  description = "Organization hub network VPC self link. Required in spoke mode."
 }
 
-variable "org_private_ca" {
-  type        = object({
-    cert = string
-    key  = string
-  })
-  default     = null
-  description = "The Organization CertificateAuthority's certificate. Required in squid mode"
+variable "enable_transitive_network" {
+  type        = bool
+  default     = true
+  description = "In hub mode, if enabled, a transit gateway will be installed."
 }

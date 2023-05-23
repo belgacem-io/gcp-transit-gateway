@@ -60,7 +60,7 @@ module "main" {
 
   project_id                             = var.project_id
   #[prefix]-[resource]-[location]-[description]-[suffix]
-  network_name                           = "${var.prefix}-network-${var.default_region}-${var.network_name}"
+  network_name                           = "${var.prefix}-network-${var.default_region}-${var.network_suffix}"
   shared_vpc_host                        = var.shared_vpc_host
   delete_default_internet_gateway_routes = true
 

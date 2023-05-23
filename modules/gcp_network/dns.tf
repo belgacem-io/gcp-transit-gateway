@@ -45,7 +45,7 @@ module "dns-forwarding-zone" {
   type       = "forwarding"
   #[prefix]-[resource]-[location]-[description]-[suffix]
   name       = "${var.prefix}-fz-glb-dns-hub"
-  domain     = var.domain
+  domain     = var.public_domain
 
   private_visibility_config_networks = [
     module.main.network_self_link
